@@ -1,3 +1,5 @@
+import Button from "./Button";
+
 const SEARCH_TERMS = [
   "Search term one",
   "Search term two",
@@ -88,12 +90,12 @@ export default function Footer() {
                 Select location
               </span>
             </div>
-            <button
-              type="button"
-              className="h-[43px] w-[187px] rounded-xl border border-white text-[18px] font-bold tracking-[-0.36px] text-white transition-colors hover:bg-white/10"
+            <Button
+              variant="outline"
+              className="h-[43px] w-[187px] text-[18px] tracking-[-0.36px]"
             >
               See the reviews
-            </button>
+            </Button>
           </div>
         </div>
       </div>

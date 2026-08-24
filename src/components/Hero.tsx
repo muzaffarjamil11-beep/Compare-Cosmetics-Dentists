@@ -1,3 +1,5 @@
+import Button from "./Button";
+
 const TREATMENTS = [
   "Clear Aligners",
   "Porcelain Veneers",
@@ -70,7 +72,7 @@ function Rating() {
 
 export default function Hero() {
   return (
-    <section className="pt-4 md:pt-0">
+    <section className="pt-4 pb-[30px] md:pt-0">
       <div className="mx-auto w-full max-w-[1440px] px-4 md:px-10">
         <div className="rounded-[20px] bg-teal-light px-4 pt-9 pb-[33px] md:pt-[78px] md:pb-[33px]">
           <div className="mx-auto flex w-full max-w-[835px] flex-col gap-[35px] md:gap-[86px]">
@@ -104,12 +106,12 @@ export default function Hero() {
                   label="Select location"
                   options={LOCATIONS}
                 />
-                <button
-                  type="button"
-                  className="h-[53px] flex-1 rounded-xl bg-primary px-[15px] text-[18px] font-bold tracking-[-0.36px] text-white transition-opacity hover:opacity-90"
+                <Button
+                  variant="primary"
+                  className="h-[53px] flex-1 px-[15px] text-[18px] tracking-[-0.36px]"
                 >
                   See the reviews
-                </button>
+                </Button>
               </div>
             </div>
 
