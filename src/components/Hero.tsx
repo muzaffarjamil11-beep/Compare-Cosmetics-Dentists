@@ -37,14 +37,16 @@ function SelectField({
         height={8}
         className="pointer-events-none absolute right-[18px]"
       />
+      {/* Colour set explicitly rather than inherited, so the native
+          dropdown stays legible regardless of the surrounding section. */}
       <select
         aria-label={label}
         defaultValue=""
-        className="absolute inset-0 h-full w-full cursor-pointer appearance-none opacity-0"
+        className="absolute inset-0 h-full w-full cursor-pointer appearance-none bg-white text-navy opacity-0"
       >
         <option value="" disabled />
         {options.map((option) => (
-          <option key={option} value={option}>
+          <option key={option} value={option} className="bg-white text-navy">
             {option}
           </option>
         ))}

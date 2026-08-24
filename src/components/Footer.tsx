@@ -67,14 +67,17 @@ function FooterSelect({
         alt=""
         className="pointer-events-none h-[8px] w-[14px] shrink-0"
       />
+      {/* The colour must be set explicitly: the surrounding footer is
+          text-white, and the native dropdown popup inherits it, which
+          renders the options white-on-white and invisible. */}
       <select
         aria-label={label}
         defaultValue=""
-        className="absolute inset-0 h-full w-full cursor-pointer appearance-none opacity-0"
+        className="absolute inset-0 h-full w-full cursor-pointer appearance-none bg-white text-black opacity-0"
       >
         <option value="" disabled />
         {options.map((option) => (
-          <option key={option} value={option}>
+          <option key={option} value={option} className="bg-white text-black">
             {option}
           </option>
         ))}
