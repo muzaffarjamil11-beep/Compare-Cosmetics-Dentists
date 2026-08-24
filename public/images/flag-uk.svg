@@ -1,0 +1,21 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="United Kingdom">
+  <defs>
+    <clipPath id="uk-circle">
+      <circle cx="16" cy="16" r="16" />
+    </clipPath>
+    <mask id="uk-diagonals" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="1" y="2" width="49" height="25">
+      <path d="M25.0732 14.1466H49.0732V26.1466L25.0732 14.1466ZM25.0732 14.1466V26.1466H1.0732L25.0732 14.1466ZM25.0732 14.1466H1.0732V2.14661L25.0732 14.1466ZM25.0732 14.1466V2.14661H49.0732L25.0732 14.1466Z" fill="white" />
+    </mask>
+  </defs>
+  <g clip-path="url(#uk-circle)">
+    <g transform="translate(-16,0) scale(1.3333333) translate(-1.0732,-2.14661)">
+      <path d="M1.0732 2.14661V26.1466H49.0732V2.14661H1.0732Z" fill="#001E6D" />
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M19.7068 14.1466L0 4.29325L2.14663 0L25.0733 11.4633L48 0L50.1466 4.29325L30.4399 14.1466L50.1466 24L48 28.2933L25.0733 16.8299L2.14663 28.2933L0 24L19.7068 14.1466Z" fill="white" />
+      <g mask="url(#uk-diagonals)">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M21.4955 14.1466L0.357656 3.57768L1.78874 0.715518L25.0732 12.3577L48.3577 0.715518L49.7887 3.57768L28.6509 14.1466L49.7887 24.7155L48.3577 27.5777L25.0732 15.9355L1.78874 27.5777L0.357656 24.7155L21.4955 14.1466Z" fill="#C8102E" />
+      </g>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M21.0732 10.1466V2.14661H29.0732V10.1466H49.0732V18.1466H29.0732V26.1466H21.0732V18.1466H1.0732V10.1466H21.0732Z" fill="white" />
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M22.6732 11.7466V2.14661H27.4732V11.7466H49.0732V16.5466H27.4732V26.1466H22.6732V16.5466H1.0732V11.7466H22.6732Z" fill="#C8102E" />
+    </g>
+  </g>
+</svg>
