@@ -40,8 +40,8 @@ export default function Header() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="bg-white px-6 py-5 md:px-10 md:py-6">
-      <div className="mx-auto max-w-[1360px]">
+    <header className="bg-white py-5 md:py-6">
+      <div className="mx-auto w-full max-w-[1440px] px-6 md:px-10">
         {/* Desktop: logo left · nav centered · flag right */}
         <div className="hidden lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-center">
           <div className="justify-self-start">

@@ -51,57 +51,74 @@ function SelectField({
   );
 }
 
+function Rating() {
+  return (
+    <div className="flex shrink-0 items-center gap-1 md:gap-2">
+      <span className="text-[13px] leading-[1.16] tracking-[-0.26px] text-navy">
+        4.9
+      </span>
+      <img
+        src="/images/stars-5.svg"
+        alt="Rated 4.9 out of 5"
+        width={68}
+        height={12}
+      />
+      <img src="/images/feefo-logo.svg" alt="feefo" width={57} height={13} />
+    </div>
+  );
+}
+
 export default function Hero() {
   return (
-    <section className="px-4 pt-4 md:px-10 md:pt-0">
-      <div className="mx-auto flex max-w-[1361px] flex-col items-center gap-[35px] rounded-[20px] bg-teal-light px-4 py-9 md:gap-[86px] md:px-[100px] md:py-[78px]">
-        <div className="flex w-full flex-col items-center gap-8 md:gap-16">
-          <div className="flex flex-col items-center gap-[30px] text-center text-navy">
-            <h1 className="text-[40px] font-bold leading-[0.94] tracking-[-0.8px] md:text-[50px] md:tracking-[-1px]">
-              Smarter dental
-              <br className="md:hidden" /> choices,
-              <br />
-              made simple
-            </h1>
-            <p className="text-[18px] leading-[1.16] tracking-[-0.36px] md:text-[24px] md:tracking-[-0.48px]">
-              We are the independent consumer
-              <br />
-              hub for UK dentistry
-            </p>
-          </div>
+    <section className="pt-4 md:pt-0">
+      <div className="mx-auto w-full max-w-[1440px] px-4 md:px-10">
+        <div className="rounded-[20px] bg-teal-light px-4 pt-9 pb-[33px] md:pt-[78px] md:pb-[33px]">
+          <div className="mx-auto flex w-full max-w-[835px] flex-col gap-[35px] md:gap-[86px]">
+            <div className="flex flex-col items-center gap-8 md:gap-16">
+              <div className="flex flex-col items-center gap-[30px] text-center text-navy">
+                <h1 className="text-[40px] font-bold leading-[0.94] tracking-[-0.8px] md:text-[50px] md:tracking-[-1px]">
+                  Smarter dental
+                  <br className="md:hidden" /> choices,
+                  <br />
+                  made simple
+                </h1>
+                <p className="text-[18px] leading-[1.16] tracking-[-0.36px] md:text-[24px] md:tracking-[-0.48px]">
+                  We are the independent consumer
+                  <br />
+                  hub for UK dentistry
+                </p>
+              </div>
 
-          <div className="flex w-full flex-col gap-[10px] md:flex-row">
-            <SelectField
-              icon="/images/icon-briefcase.svg"
-              iconWidth={17}
-              iconHeight={19}
-              label="Select treatment"
-              options={TREATMENTS}
-            />
-            <SelectField
-              icon="/images/icon-pin.svg"
-              iconWidth={18}
-              iconHeight={23}
-              label="Select location"
-              options={LOCATIONS}
-            />
-            <button
-              type="button"
-              className="h-[53px] shrink-0 rounded-xl bg-primary px-[15px] text-[18px] font-bold tracking-[-0.36px] text-white transition-opacity hover:opacity-90 md:w-auto md:flex-1"
-            >
-              See the reviews
-            </button>
-          </div>
-        </div>
+              <div className="flex w-full flex-col gap-[10px] md:flex-row">
+                <SelectField
+                  icon="/images/icon-briefcase.svg"
+                  iconWidth={17}
+                  iconHeight={19}
+                  label="Select treatment"
+                  options={TREATMENTS}
+                />
+                <SelectField
+                  icon="/images/icon-pin.svg"
+                  iconWidth={18}
+                  iconHeight={23}
+                  label="Select location"
+                  options={LOCATIONS}
+                />
+                <button
+                  type="button"
+                  className="h-[53px] flex-1 rounded-xl bg-primary px-[15px] text-[18px] font-bold tracking-[-0.36px] text-white transition-opacity hover:opacity-90"
+                >
+                  See the reviews
+                </button>
+              </div>
+            </div>
 
-        <div className="flex items-center gap-4 md:gap-[41px]">
-          <p className="text-[16px] font-bold tracking-[-0.32px] text-navy">
-            Advice you can trust
-          </p>
-          <div className="flex items-center gap-2">
-            <span className="text-[13px] tracking-[-0.26px] text-navy">4.9</span>
-            <img src="/images/trust-stars.svg" alt="" width={57} height={13} />
-            <img src="/images/feefo-badge.svg" alt="feefo" width={68} height={12} />
+            <div className="flex w-full flex-wrap items-center justify-between gap-x-2 gap-y-3 md:gap-x-4">
+              <p className="whitespace-nowrap text-[16px] font-bold leading-[1.16] tracking-[-0.32px] text-navy">
+                Advice you can trust
+              </p>
+              <Rating />
+            </div>
           </div>
         </div>
       </div>

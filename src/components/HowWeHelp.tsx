@@ -24,8 +24,8 @@ const ITEMS = [
 
 export default function HowWeHelp() {
   return (
-    <section className="px-4 py-12 md:px-10 md:py-16">
-      <div className="mx-auto flex max-w-[1361px] flex-col items-center gap-9 md:gap-[42px]">
+    <section className="py-12 md:py-16">
+      <div className="mx-auto flex w-full max-w-[1440px] flex-col items-center gap-9 px-4 md:gap-[42px] md:px-10">
         <h2 className="text-center text-[32px] font-bold leading-[0.94] tracking-[-0.64px] text-navy md:text-[42px] md:tracking-[-0.84px]">
           How Compare Cosmetic
           <br />

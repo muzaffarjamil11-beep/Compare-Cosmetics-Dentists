@@ -28,8 +28,8 @@ function Logo({ inline = false }: { inline?: boolean }) {
 
 export default function Footer() {
   return (
-    <footer className="bg-navy px-4 py-10 text-white md:px-10 md:py-[60px]">
-      <div className="mx-auto flex max-w-[1361px] flex-col gap-10 md:gap-[65px]">
+    <footer className="bg-navy py-10 text-white md:py-[60px]">
+      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-10 px-4 md:gap-[65px] md:px-10">
         {/* Desktop: search-term columns */}
         <div className="hidden gap-6 md:grid md:grid-cols-4">
           {Array.from({ length: 4 }).map((_, col) => (
