@@ -12,18 +12,73 @@ const SEARCH_TERMS = [
 
 const LEGAL_LINKS = ["Terms & Conditions", "Privacy Policy", "Cookies"];
 
-function Logo({ inline = false }: { inline?: boolean }) {
+const TREATMENTS = [
+  "Clear Aligners",
+  "Porcelain Veneers",
+  "Dental Hygienist",
+  "Composite Bonding",
+  "Dental Implants",
+  "Teeth Whitening",
+];
+
+const LOCATIONS = ["Leeds", "Huddersfield", "Manchester", "London"];
+
+function Logo({ compact = false }: { compact?: boolean }) {
   return (
-    <div className={inline ? "flex items-center gap-3" : "flex flex-col gap-1"}>
-      <img src="/images/logo-mark-white.svg" alt="" width={38} height={34} />
-      {!inline && (
-        <img
-          src="/images/logo-wordmark-white.svg"
-          alt="Compare Cosmetic Dentist"
-          width={122}
-          height={28}
-        />
-      )}
+    <div className="flex shrink-0 items-center gap-[15px]">
+      <img
+        src="/images/logo-mark-white.svg"
+        alt=""
+        className={compact ? "h-[34px] w-[38px]" : "h-[51px] w-[58px]"}
+      />
+      <img
+        src="/images/logo-wordmark-white.svg"
+        alt="Compare Cosmetic Dentist"
+        className={compact ? "h-[28px] w-[122px]" : "h-[42px] w-[182px]"}
+      />
+    </div>
+  );
+}
+
+/**
+ * Footer variant of the search field. Unlike the hero's teal-on-white
+ * version, Figma fills these icons and label in black (#000) rather than
+ * the brand blue.
+ */
+function FooterSelect({
+  icon,
+  iconClass,
+  label,
+  options,
+}: {
+  icon: string;
+  iconClass: string;
+  label: string;
+  options: string[];
+}) {
+  return (
+    <div className="relative flex h-[43px] w-[240px] items-center justify-between rounded-xl bg-white pr-[18px] pl-[15px]">
+      <span className="flex items-center gap-3">
+        <img src={icon} alt="" className={iconClass} />
+        <span className="text-[18px] tracking-[-0.36px] text-black">{label}</span>
+      </span>
+      <img
+        src="/images/footer-icon-chevron.svg"
+        alt=""
+        className="pointer-events-none h-[8px] w-[14px] shrink-0"
+      />
+      <select
+        aria-label={label}
+        defaultValue=""
+        className="absolute inset-0 h-full w-full cursor-pointer appearance-none opacity-0"
+      >
+        <option value="" disabled />
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }
@@ -65,31 +120,29 @@ export default function Footer() {
           ))}
         </div>
 
-        <div className="flex flex-col items-start justify-between gap-8 md:flex-row md:items-end">
-          <div className="flex flex-col gap-1 md:hidden">
-            <Logo inline />
-            <p className="mt-3 text-[13px] tracking-[-0.39px] text-white/80">
-              Copyright &copy; 2026
-            </p>
-          </div>
+        {/* Mobile: stacked logo + copyright */}
+        <div className="flex flex-col gap-1 md:hidden">
+          <Logo compact />
+          <p className="mt-3 text-[13px] tracking-[-0.39px] text-white/80">
+            Copyright &copy; 2026
+          </p>
+        </div>
 
-          <div className="hidden md:block">
-            <Logo />
-          </div>
-
-          <div className="hidden items-center gap-[10px] md:flex">
-            <div className="flex h-[43px] w-[240px] items-center gap-3 rounded-xl bg-white px-[15px]">
-              <img src="/images/icon-briefcase.svg" alt="" width={17} height={19} />
-              <span className="text-[18px] tracking-[-0.36px] text-navy">
-                Select treatment
-              </span>
-            </div>
-            <div className="flex h-[43px] w-[240px] items-center gap-3 rounded-xl bg-white px-[15px]">
-              <img src="/images/icon-pin.svg" alt="" width={18} height={23} />
-              <span className="text-[18px] tracking-[-0.36px] text-navy">
-                Select location
-              </span>
-            </div>
+        {/* Desktop: search fields on the left, logo on the right */}
+        <div className="hidden items-center justify-between gap-8 md:flex">
+          <div className="flex items-center gap-[10px]">
+            <FooterSelect
+              icon="/images/footer-icon-treatment.svg"
+              iconClass="h-[19px] w-[17px]"
+              label="Select treatment"
+              options={TREATMENTS}
+            />
+            <FooterSelect
+              icon="/images/footer-icon-pin.svg"
+              iconClass="h-[23px] w-[18px]"
+              label="Select location"
+              options={LOCATIONS}
+            />
             <Button
               variant="outline"
               className="h-[43px] w-[187px] text-[18px] tracking-[-0.36px]"
@@ -97,6 +150,8 @@ export default function Footer() {
               See the reviews
             </Button>
           </div>
+
+          <Logo />
         </div>
       </div>
     </footer>
