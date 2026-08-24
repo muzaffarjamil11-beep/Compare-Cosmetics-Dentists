@@ -50,14 +50,18 @@ function FooterSelect({
   iconClass,
   label,
   options,
+  className = "",
 }: {
   icon: string;
   iconClass: string;
   label: string;
   options: string[];
+  className?: string;
 }) {
   return (
-    <div className="relative flex h-[43px] w-[240px] items-center justify-between rounded-xl bg-white pr-[18px] pl-[15px]">
+    <div
+      className={`relative flex h-[43px] items-center justify-between rounded-xl bg-white pr-[18px] pl-[15px] ${className}`}
+    >
       <span className="flex items-center gap-3">
         <img src={icon} alt="" className={iconClass} />
         <span className="text-[18px] tracking-[-0.36px] text-black">{label}</span>
@@ -123,32 +127,36 @@ export default function Footer() {
           ))}
         </div>
 
-        {/* Mobile: stacked logo + copyright */}
-        <div className="flex flex-col gap-1 md:hidden">
+        {/* Mobile: logo left, copyright on its right */}
+        <div className="flex items-center justify-between gap-4 md:hidden">
           <Logo compact />
-          <p className="mt-3 text-[13px] tracking-[-0.39px] text-white/80">
+          <p className="shrink-0 text-[13px] tracking-[-0.39px] text-white/80">
             Copyright &copy; 2026
           </p>
         </div>
 
-        {/* Desktop: search fields on the left, logo on the right */}
-        <div className="hidden items-center justify-between gap-8 md:flex">
-          <div className="flex items-center gap-[10px]">
+        {/* Fields left, logo right — but the pair needs 942px plus a gap, so
+            below 1280px they stack and the fields flex to fill the row
+            instead of overflowing. */}
+        <div className="hidden flex-col gap-8 md:flex xl:flex-row xl:items-center xl:justify-between">
+          <div className="flex w-full items-center gap-[10px] xl:w-auto">
             <FooterSelect
               icon="/images/footer-icon-treatment.svg"
               iconClass="h-[19px] w-[17px]"
               label="Select treatment"
               options={TREATMENTS}
+              className="min-w-0 flex-1 xl:w-[240px] xl:flex-none"
             />
             <FooterSelect
               icon="/images/footer-icon-pin.svg"
               iconClass="h-[23px] w-[18px]"
               label="Select location"
               options={LOCATIONS}
+              className="min-w-0 flex-1 xl:w-[240px] xl:flex-none"
             />
             <Button
               variant="outline"
-              className="h-[43px] w-[187px] text-[18px] tracking-[-0.36px]"
+              className="h-[43px] w-[187px] shrink-0 text-[18px] tracking-[-0.36px]"
             >
               See the reviews
             </Button>

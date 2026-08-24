@@ -13,6 +13,11 @@
 }
 
 @theme inline {
+  /* The desktop layouts in the Figma file need ~1360px of content width.
+     Declaring it as a named breakpoint (rather than using min-[1360px])
+     lets Tailwind order it after md/lg/xl, so it wins those conflicts. */
+  --breakpoint-3xl: 1360px;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-navy: var(--color-navy);

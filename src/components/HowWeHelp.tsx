@@ -30,29 +30,31 @@ export default function HowWeHelp() {
   return (
     <section className="py-12 md:py-16">
       <div className="mx-auto w-full max-w-[1440px] px-4 md:px-10">
-        <div className="flex flex-col items-center gap-9 min-[1360px]:flex-row min-[1360px]:items-start min-[1360px]:gap-[34px]">
-          {/* 350px, not Figma's 320px: the substituted font is wider than
-              TT Commons Pro and 320 pushed "Cosmetic Dentist" onto a 4th
-              line. 350 reproduces the intended 3-line break. */}
-          <h2 className="text-center text-[32px] font-bold leading-[0.94] tracking-[-0.64px] text-navy md:text-[42px] md:tracking-[-0.84px] min-[1360px]:w-[350px] min-[1360px]:shrink-0 min-[1360px]:text-left">
+        <div className="flex flex-col items-center gap-9 3xl:flex-row 3xl:items-start 3xl:gap-[34px]">
+          {/* max-w-520 breaks the heading onto two lines from tablet up to
+              1360px. Above that the 350px column takes over and gives
+              Figma's three lines — 350 rather than Figma's 320 because the
+              substituted font is wider and 320 forced a 4th line. */}
+          <h2 className="max-w-[290px] text-center text-[32px] font-bold leading-[0.94] tracking-[-0.64px] text-navy md:max-w-[520px] md:text-[42px] md:tracking-[-0.84px] 3xl:w-[350px] 3xl:max-w-none 3xl:shrink-0 3xl:text-left">
             How Compare Cosmetic Dentist can help you
           </h2>
 
-          <div className="flex w-full flex-col items-center gap-9 lg:flex-row lg:items-start lg:justify-center lg:gap-[39px] min-[1360px]:w-auto min-[1360px]:flex-1 min-[1360px]:justify-end">
+          <div className="flex w-full flex-col items-center gap-9 md:flex-row md:items-start md:gap-6 lg:gap-[39px] 3xl:w-auto 3xl:flex-1 3xl:justify-end">
             {ITEMS.map((item) => (
               <div
                 key={item.title}
-                className="flex flex-col items-center gap-[18px] text-center"
+                className="flex w-full flex-col items-center gap-[18px] text-center md:min-w-0 md:flex-1 3xl:w-auto 3xl:flex-none"
               >
                 <div className="flex size-[50px] shrink-0 items-center justify-center rounded-[10px] bg-teal-light">
                   <img src={item.icon} alt="" className={item.iconClass} />
                 </div>
-                <p className="text-[18px] leading-[1.16] tracking-[-0.36px] text-navy">
-                  <span className="font-bold">{item.title}</span>
-                  <br />
-                  {item.lines[0]}
-                  <br />
-                  {item.lines[1]}
+                {/* The copy only carries Figma's hard line breaks at the
+                    width they were drawn for; below that the two spans sit
+                    inline and wrap to whatever the column allows. */}
+                <p className="text-[16px] leading-[1.16] tracking-[-0.32px] text-navy lg:text-[18px] lg:tracking-[-0.36px]">
+                  <span className="block font-bold">{item.title}</span>
+                  <span className="3xl:block">{item.lines[0]}</span>{" "}
+                  <span className="3xl:block">{item.lines[1]}</span>
                 </p>
               </div>
             ))}

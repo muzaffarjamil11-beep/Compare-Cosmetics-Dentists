@@ -24,18 +24,28 @@ function SelectField({
   label: string;
   options: string[];
 }) {
+  // The chevron sits in flow rather than absolutely positioned, so it always
+  // reserves its own space instead of overlapping the label on narrow fields.
   return (
-    <div className="relative flex h-[53px] flex-1 items-center rounded-xl bg-white pl-[15px] pr-[18px]">
-      <div className="flex items-center gap-3">
-        <img src={icon} alt="" width={iconWidth} height={iconHeight} />
-        <span className="text-[18px] tracking-[-0.36px] text-navy">{label}</span>
-      </div>
+    <div className="relative flex h-[53px] w-full items-center justify-between gap-2 rounded-xl bg-white pr-[18px] pl-[15px] lg:w-auto lg:flex-1">
+      <span className="flex min-w-0 items-center gap-3">
+        <img
+          src={icon}
+          alt=""
+          width={iconWidth}
+          height={iconHeight}
+          className="shrink-0"
+        />
+        <span className="truncate text-[18px] tracking-[-0.36px] text-navy">
+          {label}
+        </span>
+      </span>
       <img
         src="/images/icon-chevron-down.svg"
         alt=""
         width={14}
         height={8}
-        className="pointer-events-none absolute right-[18px]"
+        className="pointer-events-none shrink-0"
       />
       {/* Colour set explicitly rather than inherited, so the native
           dropdown stays legible regardless of the surrounding section. */}
@@ -93,7 +103,9 @@ export default function Hero() {
                 </p>
               </div>
 
-              <div className="flex w-full flex-col gap-[10px] md:flex-row">
+              {/* Three controls need ~600px to sit side by side without
+                  cramping the labels, so they stack until lg. */}
+              <div className="flex w-full flex-col gap-[10px] lg:flex-row">
                 <SelectField
                   icon="/images/icon-briefcase.svg"
                   iconWidth={17}
@@ -110,7 +122,7 @@ export default function Hero() {
                 />
                 <Button
                   variant="primary"
-                  className="h-[53px] flex-1 px-[15px] text-[18px] tracking-[-0.36px]"
+                  className="h-[53px] w-full px-[15px] text-[18px] tracking-[-0.36px] lg:w-auto lg:flex-1"
                 >
                   See the reviews
                 </Button>
