@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const NAV_LINKS = [
-  { label: "General Dentistry", href: "/search" },
+  { label: "General Dentistry", href: "#" },
   { label: "Cosmetic Dentistry", href: "#" },
   { label: "Restorative", href: "#" },
   { label: "Orthodontics", href: "#" },

@@ -1,69 +1,4 @@
-import Button from "./Button";
-
-const TREATMENTS = [
-  "Clear Aligners",
-  "Porcelain Veneers",
-  "Dental Hygienist",
-  "Composite Bonding",
-  "Dental Implants",
-  "Teeth Whitening",
-];
-
-const LOCATIONS = ["Leeds", "Huddersfield", "Manchester", "London"];
-
-function SelectField({
-  icon,
-  iconWidth,
-  iconHeight,
-  label,
-  options,
-}: {
-  icon: string;
-  iconWidth: number;
-  iconHeight: number;
-  label: string;
-  options: string[];
-}) {
-  // The chevron sits in flow rather than absolutely positioned, so it always
-  // reserves its own space instead of overlapping the label on narrow fields.
-  return (
-    <div className="relative flex h-[53px] w-full items-center justify-between gap-2 rounded-xl bg-white pr-[18px] pl-[15px] lg:w-auto lg:flex-1">
-      <span className="flex min-w-0 items-center gap-3">
-        <img
-          src={icon}
-          alt=""
-          width={iconWidth}
-          height={iconHeight}
-          className="shrink-0"
-        />
-        <span className="truncate text-[18px] tracking-[-0.36px] text-navy">
-          {label}
-        </span>
-      </span>
-      <img
-        src="/images/icon-chevron-down.svg"
-        alt=""
-        width={14}
-        height={8}
-        className="pointer-events-none shrink-0"
-      />
-      {/* Colour set explicitly rather than inherited, so the native
-          dropdown stays legible regardless of the surrounding section. */}
-      <select
-        aria-label={label}
-        defaultValue=""
-        className="absolute inset-0 h-full w-full cursor-pointer appearance-none bg-white text-navy opacity-0"
-      >
-        <option value="" disabled />
-        {options.map((option) => (
-          <option key={option} value={option} className="bg-white text-navy">
-            {option}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
+import SearchForm from "./SearchForm";
 
 function Rating() {
   return (
@@ -105,28 +40,7 @@ export default function Hero() {
 
               {/* Three controls need ~600px to sit side by side without
                   cramping the labels, so they stack until lg. */}
-              <div className="flex w-full flex-col gap-[10px] lg:flex-row">
-                <SelectField
-                  icon="/images/icon-briefcase.svg"
-                  iconWidth={17}
-                  iconHeight={19}
-                  label="Select treatment"
-                  options={TREATMENTS}
-                />
-                <SelectField
-                  icon="/images/icon-pin.svg"
-                  iconWidth={18}
-                  iconHeight={23}
-                  label="Select location"
-                  options={LOCATIONS}
-                />
-                <Button
-                  variant="primary"
-                  className="h-[53px] w-full px-[15px] text-[18px] tracking-[-0.36px] lg:w-auto lg:flex-1"
-                >
-                  See the reviews
-                </Button>
-              </div>
+              <SearchForm variant="hero" />
             </div>
 
             <div className="flex w-full flex-wrap items-center justify-between gap-x-2 gap-y-3 md:gap-x-4">

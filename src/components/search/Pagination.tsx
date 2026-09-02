@@ -1,56 +1,80 @@
-"use client";
+import Link from "next/link";
 
-import { useState } from "react";
+/** Window of page numbers around the current page. */
+function pageWindow(page: number, totalPages: number, span = 5): number[] {
+  const half = Math.floor(span / 2);
+  let start = Math.max(1, page - half);
+  const end = Math.min(totalPages, start + span - 1);
+  start = Math.max(1, end - span + 1);
+  return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+}
 
-const TOTAL_PAGES = 5;
+export default function Pagination({
+  page,
+  totalPages,
+  buildHref,
+}: {
+  page: number;
+  totalPages: number;
+  buildHref: (page: number) => string;
+}) {
+  if (totalPages <= 1) return null;
 
-export default function Pagination() {
-  const [page, setPage] = useState(1);
+  const pages = pageWindow(page, totalPages);
+  const inert =
+    "cursor-default text-[15px] tracking-[-0.3px] text-navy/35 sm:text-[17px]";
+  const active =
+    "cursor-pointer text-[15px] tracking-[-0.3px] text-navy transition-opacity hover:opacity-70 sm:text-[17px]";
 
   return (
     <nav
       aria-label="Search results pages"
       className="flex items-center justify-between gap-4"
     >
-      <button
-        type="button"
-        onClick={() => setPage((p) => Math.max(1, p - 1))}
-        disabled={page === 1}
-        className="cursor-pointer text-[15px] tracking-[-0.3px] text-navy transition-opacity hover:opacity-70 disabled:cursor-default disabled:opacity-35 sm:text-[17px]"
-      >
-        Previous
-      </button>
+      {page > 1 ? (
+        <Link href={buildHref(page - 1)} className={active} scroll={false}>
+          Previous
+        </Link>
+      ) : (
+        <span aria-disabled="true" className={inert}>
+          Previous
+        </span>
+      )}
 
       <div className="flex items-center gap-[6px]">
-        {Array.from({ length: TOTAL_PAGES }, (_, i) => i + 1).map((n) => {
+        {pages.map((n) => {
           const isCurrent = n === page;
-          return (
-            <button
+          return isCurrent ? (
+            <span
               key={n}
-              type="button"
-              onClick={() => setPage(n)}
-              aria-current={isCurrent ? "page" : undefined}
-              aria-label={`Page ${n}`}
-              className={`flex size-[36px] cursor-pointer items-center justify-center rounded-full text-[15px] tracking-[-0.3px] transition-colors sm:text-[17px] ${
-                isCurrent
-                  ? "bg-primary font-bold text-white"
-                  : "text-navy hover:bg-primary-light"
-              }`}
+              aria-current="page"
+              className="flex size-[36px] items-center justify-center rounded-full bg-primary text-[15px] font-bold text-white sm:text-[17px]"
             >
               {n}
-            </button>
+            </span>
+          ) : (
+            <Link
+              key={n}
+              href={buildHref(n)}
+              aria-label={`Page ${n}`}
+              scroll={false}
+              className="flex size-[36px] items-center justify-center rounded-full text-[15px] tracking-[-0.3px] text-navy transition-colors hover:bg-primary-light sm:text-[17px]"
+            >
+              {n}
+            </Link>
           );
         })}
       </div>
 
-      <button
-        type="button"
-        onClick={() => setPage((p) => Math.min(TOTAL_PAGES, p + 1))}
-        disabled={page === TOTAL_PAGES}
-        className="cursor-pointer text-[15px] tracking-[-0.3px] text-navy transition-opacity hover:opacity-70 disabled:cursor-default disabled:opacity-35 sm:text-[17px]"
-      >
-        Next
-      </button>
+      {page < totalPages ? (
+        <Link href={buildHref(page + 1)} className={active} scroll={false}>
+          Next
+        </Link>
+      ) : (
+        <span aria-disabled="true" className={inert}>
+          Next
+        </span>
+      )}
     </nav>
   );
 }

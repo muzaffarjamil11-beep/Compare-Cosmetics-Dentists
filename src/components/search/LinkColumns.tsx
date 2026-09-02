@@ -4,12 +4,15 @@ import { useState } from "react";
 
 const INITIAL_VISIBLE = 21;
 
+export type ColumnLink = { label: string; href: string };
+
 export default function LinkColumns({
   title,
   items,
 }: {
   title: string;
-  items: string[];
+  /** Plain objects, not a builder function — this is a Client Component. */
+  items: ColumnLink[];
 }) {
   const [expanded, setExpanded] = useState(false);
   const visible = expanded ? items : items.slice(0, INITIAL_VISIBLE);
@@ -23,12 +26,12 @@ export default function LinkColumns({
 
       <ul className="mt-[18px] grid grid-cols-1 gap-x-8 gap-y-[10px] sm:grid-cols-2 lg:grid-cols-3">
         {visible.map((item) => (
-          <li key={item}>
+          <li key={item.label}>
             <a
-              href="#"
+              href={item.href}
               className="text-[15px] leading-[1.5] tracking-[-0.3px] text-primary transition-opacity hover:opacity-70 hover:underline sm:text-[16px]"
             >
-              {item}
+              {item.label}
             </a>
           </li>
         ))}

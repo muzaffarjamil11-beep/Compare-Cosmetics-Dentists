@@ -1,17 +1,19 @@
 "use client";
 
+import { useRouter, useSearchParams } from "next/navigation";
 import { useId, useState } from "react";
-import { TREATMENT_TYPES } from "@/lib/search-data";
 
 function AccordionSection({
   title,
   open,
   onToggle,
+  note,
   children,
 }: {
   title: string;
   open: boolean;
   onToggle: () => void;
+  note?: string;
   children?: React.ReactNode;
 }) {
   const panelId = useId();
@@ -29,7 +31,6 @@ function AccordionSection({
           <span className="text-[20px] leading-[1.1] tracking-[-0.44px] text-navy sm:text-[22px]">
             {title}
           </span>
-          {/* Asset points down; flip it when the section is open. */}
           <img
             src="/images/icon-chevron-down.svg"
             alt=""
@@ -47,24 +48,53 @@ function AccordionSection({
         }`}
       >
         <div className="overflow-hidden">
-          <div className="pt-[16px] pb-[18px]">{children}</div>
+          <div className="pt-[16px] pb-[18px]">
+            {note && (
+              <p className="mb-3 text-[14px] leading-[1.4] text-navy/60">
+                {note}
+              </p>
+            )}
+            {children}
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-export default function FilterSidebar() {
+export default function FilterSidebar({
+  treatments,
+  regions,
+  resultCount,
+}: {
+  treatments: string[];
+  regions: string[];
+  resultCount: number;
+}) {
+  const router = useRouter();
+  const params = useSearchParams();
+
   const [openSection, setOpenSection] = useState<string | null>("treatment");
-  const [treatment, setTreatment] = useState(TREATMENT_TYPES[0]);
+
+  const treatment = params.get("treatment") ?? "";
+  const region = params.get("region") ?? "";
 
   const toggle = (key: string) =>
     setOpenSection((current) => (current === key ? null : key));
 
+  /** Push a changed filter into the URL so results and links stay shareable. */
+  const setParam = (key: string, value: string) => {
+    const next = new URLSearchParams(params.toString());
+    if (value) next.set(key, value);
+    else next.delete(key);
+    next.delete("page");
+    router.push(`/search?${next.toString()}`, { scroll: false });
+  };
+
   return (
     <aside className="w-full lg:w-[320px] lg:shrink-0">
       <div className="lg:w-[270px]">
-        <div className="flex items-center gap-[9px] pb-[24px]">
+        <div className="flex items-center gap-[9px] pb-[6px]">
           <img
             src="/images/icon-filter.svg"
             alt=""
@@ -74,14 +104,18 @@ export default function FilterSidebar() {
             Filter results
           </h2>
         </div>
+        <p className="pb-[18px] text-[14px] text-navy/60">
+          {resultCount.toLocaleString("en-GB")} CQC-registered practices
+        </p>
 
         <AccordionSection
           title="Treatment type"
           open={openSection === "treatment"}
           onToggle={() => toggle("treatment")}
+          note="Treatment is used to frame your search. The CQC register does not record which treatments each practice offers, so it does not narrow the list below."
         >
           <div className="flex flex-col gap-[14px]">
-            {TREATMENT_TYPES.map((type) => (
+            {treatments.map((type) => (
               <label
                 key={type}
                 className="flex cursor-pointer items-center gap-[7px]"
@@ -91,11 +125,9 @@ export default function FilterSidebar() {
                   name="treatment-type"
                   value={type}
                   checked={treatment === type}
-                  onChange={() => setTreatment(type)}
+                  onChange={() => setParam("treatment", type)}
                   className="peer sr-only"
                 />
-                {/* Styled control: hollow ring by default, solid navy when
-                    selected, with a visible focus ring for keyboard users. */}
                 <span
                   aria-hidden="true"
                   className="size-[16px] shrink-0 rounded-full border border-navy/25 bg-white transition-colors peer-checked:border-navy peer-checked:bg-navy peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-2"
@@ -109,24 +141,68 @@ export default function FilterSidebar() {
         </AccordionSection>
 
         <AccordionSection
+          title="Region"
+          open={openSection === "region"}
+          onToggle={() => toggle("region")}
+        >
+          <div className="flex flex-col gap-[14px]">
+            <label className="flex cursor-pointer items-center gap-[7px]">
+              <input
+                type="radio"
+                name="region"
+                value=""
+                checked={region === ""}
+                onChange={() => setParam("region", "")}
+                className="peer sr-only"
+              />
+              <span
+                aria-hidden="true"
+                className="size-[16px] shrink-0 rounded-full border border-navy/25 bg-white transition-colors peer-checked:border-navy peer-checked:bg-navy peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-2"
+              />
+              <span className="text-[16px] leading-[1.1] tracking-[-0.34px] text-navy sm:text-[17px]">
+                All regions
+              </span>
+            </label>
+            {regions.map((r) => (
+              <label
+                key={r}
+                className="flex cursor-pointer items-center gap-[7px]"
+              >
+                <input
+                  type="radio"
+                  name="region"
+                  value={r}
+                  checked={region === r}
+                  onChange={() => setParam("region", r)}
+                  className="peer sr-only"
+                />
+                <span
+                  aria-hidden="true"
+                  className="size-[16px] shrink-0 rounded-full border border-navy/25 bg-white transition-colors peer-checked:border-navy peer-checked:bg-navy peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-2"
+                />
+                <span className="text-[16px] leading-[1.1] tracking-[-0.34px] text-navy sm:text-[17px]">
+                  {r}
+                </span>
+              </label>
+            ))}
+          </div>
+        </AccordionSection>
+
+        {/* Kept in place so the design's filter set stays recognisable, but
+            honest: the CQC export has no pricing or rating columns. */}
+        <AccordionSection
           title="Cost"
           open={openSection === "cost"}
           onToggle={() => toggle("cost")}
-        >
-          <p className="text-[16px] leading-[1.4] text-navy/70">
-            Price filters become available once live pricing is connected.
-          </p>
-        </AccordionSection>
+          note="Not available yet. The CQC register does not publish treatment pricing, so this filter needs a pricing source before it can work."
+        />
 
         <AccordionSection
           title="Rating"
           open={openSection === "rating"}
           onToggle={() => toggle("rating")}
-        >
-          <p className="text-[16px] leading-[1.4] text-navy/70">
-            Rating filters become available once live reviews are connected.
-          </p>
-        </AccordionSection>
+          note="Not available yet. This CQC export contains no rating column, so this filter needs a reviews source before it can work."
+        />
       </div>
     </aside>
   );
