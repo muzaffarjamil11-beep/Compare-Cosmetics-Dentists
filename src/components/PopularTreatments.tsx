@@ -88,7 +88,7 @@ export default function PopularTreatments({ city = "Leeds" }: { city?: string })
                         alt=""
                         aria-hidden="true"
                         className={`h-[8px] w-[14px] shrink-0 transition-transform duration-300 ease-out motion-reduce:transition-none ${
-                          isOpen ? "rotate-0" : "-rotate-90"
+                          isOpen ? "rotate-[0deg]" : "-rotate-90"
                         }`}
                       />
                     </button>
