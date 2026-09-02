@@ -4,10 +4,10 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const NAV_LINKS = [
-  "General Dentistry",
-  "Cosmetic Dentistry",
-  "Restorative",
-  "Orthodontics",
+  { label: "General Dentistry", href: "/search" },
+  { label: "Cosmetic Dentistry", href: "#" },
+  { label: "Restorative", href: "#" },
+  { label: "Orthodontics", href: "#" },
 ];
 
 function Logo() {
@@ -71,13 +71,13 @@ export default function Header() {
             </div>
 
             <nav className="flex items-center gap-[20px] justify-self-center xl:gap-[30px]">
-              {NAV_LINKS.map((label) => (
+              {NAV_LINKS.map((link) => (
                 <Link
-                  key={label}
-                  href="#"
+                  key={link.label}
+                  href={link.href}
                   className="whitespace-nowrap text-[18px] leading-[1.16] tracking-[-0.48px] text-navy transition-opacity hover:opacity-70 xl:text-[24px]"
                 >
-                  {label}
+                  {link.label}
                 </Link>
               ))}
             </nav>
@@ -143,14 +143,14 @@ export default function Header() {
         </div>
 
         <nav className="flex flex-col gap-1 px-6 py-4">
-          {NAV_LINKS.map((label) => (
+          {NAV_LINKS.map((link) => (
             <Link
-              key={label}
-              href="#"
+              key={link.label}
+              href={link.href}
               onClick={() => setOpen(false)}
               className="rounded-lg py-3 text-[18px] tracking-[-0.36px] text-navy transition-colors hover:bg-primary-light"
             >
-              {label}
+              {link.label}
             </Link>
           ))}
         </nav>
