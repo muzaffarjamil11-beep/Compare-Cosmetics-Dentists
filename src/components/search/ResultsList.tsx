@@ -3,8 +3,8 @@
 import { useState } from "react";
 import type { RankedClinic } from "@/lib/clinics";
 
-/** How many results carry the "Featured practice" chip and a logo. */
-const FEATURED_COUNT = 3;
+/** Expand/collapse timing. Slow enough to read as a deliberate reveal. */
+const EASE = "duration-500 ease-out motion-reduce:duration-0";
 
 const ACTION_BASE =
   "flex h-[54px] flex-1 items-center justify-center rounded-[15px] px-4 text-[18px] font-bold tracking-[-0.4px] transition-transform duration-200 ease-out motion-reduce:transition-none sm:text-[20px]";
@@ -178,26 +178,33 @@ function DetailPanel({ clinic }: { clinic: RankedClinic }) {
 
 /**
  * One card design for every result: numbered, clickable, and expanding to
- * reveal pricing and actions. The top three additionally carry the featured
- * chip and a logo; lower cards stay clean, with neither.
+ * reveal pricing and actions. The chip and the top-right logo belong to
+ * whichever clinic is open, so they follow the selection rather than rank.
+ *
+ * Everything animates from a permanently-mounted DOM node — an expanding
+ * `hidden` attribute cannot transition, which is why the old version snapped
+ * open. The panel animates via grid-template-rows, which interpolates to the
+ * content's real height without needing to measure it.
  */
 function ClinicCard({
   clinic,
   rank,
-  featured,
   active,
   onSelect,
 }: {
   clinic: RankedClinic;
   rank: number;
-  featured: boolean;
   active: boolean;
   onSelect: () => void;
 }) {
   const panelId = `clinic-panel-${clinic.id}`;
 
   return (
-    <div className="rounded-[25px] bg-white px-[19px] pt-[19px] pb-[21px]">
+    <div
+      className={`rounded-[25px] bg-white px-[19px] pt-[19px] pb-[21px] transition-shadow ${EASE} ${
+        active ? "shadow-[0_2px_18px_rgba(35,27,112,0.08)]" : ""
+      }`}
+    >
       <button
         type="button"
         onClick={onSelect}
@@ -205,35 +212,62 @@ function ClinicCard({
         aria-controls={panelId}
         className="flex w-full cursor-pointer items-start gap-[14px] text-left"
       >
-        <span className="flex min-w-0 flex-1 flex-col gap-[8px]">
-          {featured && (
-            <span className="flex h-[28px] w-fit items-center rounded-[16px] bg-[#e7f9fc] px-[12px] text-[14px] font-medium text-navy">
-              {clinic.cqcRating ? `CQC ${clinic.cqcRating}` : "Featured practice"}
+        <span className="flex min-w-0 flex-1 flex-col">
+          {/* Chip grows in with the panel. Every clinic here is on the CQC
+              register, so the label stays accurate for any of them. */}
+          <span
+            className={`grid transition-[grid-template-rows] ${EASE} ${
+              active ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+            }`}
+          >
+            <span className="overflow-hidden">
+              <span
+                className={`mb-[8px] flex h-[28px] w-fit items-center rounded-[16px] bg-[#e7f9fc] px-[12px] text-[14px] font-medium text-navy transition-opacity ${EASE} ${
+                  active ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                {clinic.cqcRating
+                  ? `CQC ${clinic.cqcRating}`
+                  : "CQC registered"}
+              </span>
             </span>
-          )}
-          <span className="text-[20px] font-bold leading-[1.05] tracking-[-0.5px] text-navy sm:text-[24px]">
-            #{rank} {clinic.name}
           </span>
-          <LocationLine clinic={clinic} />
-          <ReviewWeight clinic={clinic} />
+
+          <span className="flex flex-col gap-[8px]">
+            <span className="text-[20px] font-bold leading-[1.05] tracking-[-0.5px] text-navy sm:text-[24px]">
+              #{rank} {clinic.name}
+            </span>
+            <LocationLine clinic={clinic} />
+            <ReviewWeight clinic={clinic} />
+          </span>
         </span>
 
-        {/* Logo slot, featured cards only. No logo ships in the CQC register,
-            so this shows the practice initials until a source is attached. */}
-        {featured && (
-          <span className="flex size-[62px] shrink-0 items-center justify-center rounded-[12px] bg-primary-light text-[20px] font-bold text-navy sm:size-[77px] sm:text-[24px]">
-            {initials(clinic.name)}
-          </span>
-        )}
+        {/* Logo slot. Animating width rather than unmounting keeps the reveal
+            smooth and leaves no reserved gap while collapsed. No logo ships
+            in the CQC register, so this shows the practice initials. */}
+        <span
+          aria-hidden={!active}
+          className={`flex shrink-0 items-center justify-center overflow-hidden rounded-[12px] bg-primary-light font-bold text-navy transition-all ${EASE} ${
+            active
+              ? "size-[62px] scale-100 text-[20px] opacity-100 sm:size-[77px] sm:text-[24px]"
+              : "size-0 scale-90 text-[0px] opacity-0"
+          }`}
+        >
+          {initials(clinic.name)}
+        </span>
       </button>
 
       <div
         id={panelId}
-        hidden={!active}
         role="region"
         aria-label={`${clinic.name} pricing and contact`}
+        className={`grid transition-[grid-template-rows] ${EASE} ${
+          active ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        }`}
       >
-        {active && <DetailPanel clinic={clinic} />}
+        <div className="overflow-hidden">
+          <DetailPanel clinic={clinic} />
+        </div>
       </div>
     </div>
   );
@@ -259,7 +293,6 @@ export default function ResultsList({
           key={clinic.id}
           clinic={clinic}
           rank={startRank + index + 1}
-          featured={startRank + index < FEATURED_COUNT}
           active={activeId === clinic.id}
           onSelect={() =>
             setActiveId(activeId === clinic.id ? null : clinic.id)
