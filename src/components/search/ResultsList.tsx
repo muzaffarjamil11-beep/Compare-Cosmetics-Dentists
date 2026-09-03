@@ -3,8 +3,8 @@
 import { useState } from "react";
 import type { RankedClinic } from "@/lib/clinics";
 
-/** How many results get the numbered, expandable treatment. */
-const RANKED_COUNT = 3;
+/** How many results carry the "Featured practice" chip and a logo. */
+const FEATURED_COUNT = 3;
 
 const ACTION_BASE =
   "flex h-[54px] flex-1 items-center justify-center rounded-[15px] px-4 text-[18px] font-bold tracking-[-0.4px] transition-transform duration-200 ease-out motion-reduce:transition-none sm:text-[20px]";
@@ -87,10 +87,51 @@ function PriceBox({ label, value }: { label: string; value: string }) {
 
 const money = (v?: number) =>
   typeof v === "number" ? `£${v.toLocaleString("en-GB")}` : "On enquiry";
-const yesNo = (v?: boolean) => (v === undefined ? "On enquiry" : v ? "Yes" : "No");
+const yesNo = (v?: boolean) =>
+  v === undefined ? "On enquiry" : v ? "Yes" : "No";
 
-/** Price row + actions. Only rendered for the clinic the user has active. */
-function ActivePanel({ clinic }: { clinic: RankedClinic }) {
+function ActionLink({
+  href,
+  variant,
+  label,
+  missingLabel,
+  external = false,
+}: {
+  href: string;
+  variant: "primary" | "secondary";
+  label: string;
+  missingLabel: string;
+  external?: boolean;
+}) {
+  const colour =
+    variant === "primary"
+      ? "bg-primary text-white"
+      : "bg-primary-light text-navy";
+
+  if (!href) {
+    return (
+      <span
+        aria-disabled="true"
+        className={`${ACTION_BASE} ${colour} cursor-default opacity-45`}
+      >
+        {missingLabel}
+      </span>
+    );
+  }
+
+  return (
+    <a
+      href={href}
+      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      className={`${ACTION_BASE} ${colour} hover:scale-105 active:scale-[0.98] motion-reduce:hover:scale-100`}
+    >
+      {label}
+    </a>
+  );
+}
+
+/** Price row + actions. Rendered only for the clinic the user has active. */
+function DetailPanel({ clinic }: { clinic: RankedClinic }) {
   const p = clinic.pricing;
 
   return (
@@ -110,73 +151,46 @@ function ActivePanel({ clinic }: { clinic: RankedClinic }) {
       </div>
 
       <div className="mt-[18px] flex flex-col gap-[11px] sm:flex-row">
-        {clinic.cqcUrl ? (
-          <a
-            href={clinic.cqcUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`${ACTION_BASE} bg-primary-light text-navy hover:scale-105 active:scale-[0.98] motion-reduce:hover:scale-100`}
-          >
-            CQC report
-          </a>
-        ) : (
-          <span
-            aria-disabled="true"
-            className={`${ACTION_BASE} cursor-default bg-primary-light text-navy opacity-45`}
-          >
-            CQC report
-          </span>
-        )}
-        {clinic.phone ? (
-          <a
-            href={`tel:${clinic.phone.replace(/\s+/g, "")}`}
-            className={`${ACTION_BASE} bg-primary-light text-navy hover:scale-105 active:scale-[0.98] motion-reduce:hover:scale-100`}
-          >
-            Call now
-          </a>
-        ) : (
-          <span
-            aria-disabled="true"
-            className={`${ACTION_BASE} cursor-default bg-primary-light text-navy opacity-45`}
-          >
-            No phone listed
-          </span>
-        )}
-        {clinic.website ? (
-          <a
-            href={clinic.website}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`${ACTION_BASE} bg-primary text-white hover:scale-105 active:scale-[0.98] motion-reduce:hover:scale-100`}
-          >
-            Visit website
-          </a>
-        ) : (
-          <span
-            aria-disabled="true"
-            className={`${ACTION_BASE} cursor-default bg-primary text-white opacity-45`}
-          >
-            No website
-          </span>
-        )}
+        <ActionLink
+          href={clinic.cqcUrl}
+          variant="secondary"
+          label="CQC report"
+          missingLabel="CQC report"
+          external
+        />
+        <ActionLink
+          href={clinic.phone ? `tel:${clinic.phone.replace(/\s+/g, "")}` : ""}
+          variant="secondary"
+          label="Call now"
+          missingLabel="No phone listed"
+        />
+        <ActionLink
+          href={clinic.website}
+          variant="primary"
+          label="Visit website"
+          missingLabel="No website"
+          external
+        />
       </div>
     </div>
   );
 }
 
 /**
- * Ranked card: logo top-left, number beside the name, location and review
- * weight. Its price row and buttons show only while it is the active clinic —
- * clicking another ranked card moves the panel to that one.
+ * One card design for every result: numbered, clickable, and expanding to
+ * reveal pricing and actions. The top three additionally carry the featured
+ * chip and a logo; lower cards stay clean, with neither.
  */
-function RankedCard({
+function ClinicCard({
   clinic,
   rank,
+  featured,
   active,
   onSelect,
 }: {
   clinic: RankedClinic;
   rank: number;
+  featured: boolean;
   active: boolean;
   onSelect: () => void;
 }) {
@@ -191,24 +205,26 @@ function RankedCard({
         aria-controls={panelId}
         className="flex w-full cursor-pointer items-start gap-[14px] text-left"
       >
-        {/* Logo slot. No logo ships in the CQC register, so this shows the
-            practice initials until a logo source is attached. */}
-        <span className="flex size-[62px] shrink-0 items-center justify-center rounded-[12px] bg-primary-light text-[20px] font-bold text-navy sm:size-[77px] sm:text-[24px]">
-          {initials(clinic.name)}
-        </span>
-
-        <span className="flex min-w-0 flex-col gap-[8px]">
-          {clinic.cqcRating && (
+        <span className="flex min-w-0 flex-1 flex-col gap-[8px]">
+          {featured && (
             <span className="flex h-[28px] w-fit items-center rounded-[16px] bg-[#e7f9fc] px-[12px] text-[14px] font-medium text-navy">
-              CQC {clinic.cqcRating}
+              {clinic.cqcRating ? `CQC ${clinic.cqcRating}` : "Featured practice"}
             </span>
           )}
-          <span className="text-[22px] font-bold leading-[1.05] tracking-[-0.56px] text-navy sm:text-[28px]">
+          <span className="text-[20px] font-bold leading-[1.05] tracking-[-0.5px] text-navy sm:text-[24px]">
             #{rank} {clinic.name}
           </span>
           <LocationLine clinic={clinic} />
           <ReviewWeight clinic={clinic} />
         </span>
+
+        {/* Logo slot, featured cards only. No logo ships in the CQC register,
+            so this shows the practice initials until a source is attached. */}
+        {featured && (
+          <span className="flex size-[62px] shrink-0 items-center justify-center rounded-[12px] bg-primary-light text-[20px] font-bold text-navy sm:size-[77px] sm:text-[24px]">
+            {initials(clinic.name)}
+          </span>
+        )}
       </button>
 
       <div
@@ -217,57 +233,39 @@ function RankedCard({
         role="region"
         aria-label={`${clinic.name} pricing and contact`}
       >
-        {active && <ActivePanel clinic={clinic} />}
+        {active && <DetailPanel clinic={clinic} />}
       </div>
     </div>
   );
 }
 
-/** Lower card: no number, no logo, no CQC/website links — name, location, reviews. */
-function PlainCard({ clinic }: { clinic: RankedClinic }) {
-  return (
-    <div className="flex flex-col gap-[10px] rounded-[25px] bg-white px-[19px] pt-[19px] pb-[21px]">
-      <h3 className="text-[20px] font-bold leading-[1.05] tracking-[-0.5px] text-navy sm:text-[24px]">
-        {clinic.name}
-      </h3>
-      <LocationLine clinic={clinic} />
-      <ReviewWeight clinic={clinic} />
-    </div>
-  );
-}
-
-export default function ResultsList({ clinics }: { clinics: RankedClinic[] }) {
-  const ranked = clinics.slice(0, RANKED_COUNT);
-  const rest = clinics.slice(RANKED_COUNT);
-
-  // The first ranked clinic starts expanded; selecting another moves the panel.
+export default function ResultsList({
+  clinics,
+  startRank = 0,
+}: {
+  clinics: RankedClinic[];
+  /** Results already listed on earlier pages, so numbering keeps running. */
+  startRank?: number;
+}) {
+  // The first result starts expanded; selecting another moves the panel.
   const [activeId, setActiveId] = useState<string | null>(
-    ranked[0]?.id ?? null,
+    clinics[0]?.id ?? null,
   );
 
   return (
-    <>
-      <div className="flex flex-col gap-[16px]">
-        {ranked.map((clinic, index) => (
-          <RankedCard
-            key={clinic.id}
-            clinic={clinic}
-            rank={index + 1}
-            active={activeId === clinic.id}
-            onSelect={() =>
-              setActiveId(activeId === clinic.id ? null : clinic.id)
-            }
-          />
-        ))}
-      </div>
-
-      {rest.length > 0 && (
-        <div className="mt-[20px] flex flex-col gap-[20px]">
-          {rest.map((clinic) => (
-            <PlainCard key={clinic.id} clinic={clinic} />
-          ))}
-        </div>
-      )}
-    </>
+    <div className="flex flex-col gap-[16px]">
+      {clinics.map((clinic, index) => (
+        <ClinicCard
+          key={clinic.id}
+          clinic={clinic}
+          rank={startRank + index + 1}
+          featured={startRank + index < FEATURED_COUNT}
+          active={activeId === clinic.id}
+          onSelect={() =>
+            setActiveId(activeId === clinic.id ? null : clinic.id)
+          }
+        />
+      ))}
+    </div>
   );
 }

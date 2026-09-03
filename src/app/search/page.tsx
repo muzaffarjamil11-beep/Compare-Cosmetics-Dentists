@@ -156,7 +156,10 @@ export default async function SearchPage({
                     region filter.
                   </p>
                 ) : (
-                  <ResultsList clinics={results.clinics} />
+                  <ResultsList
+                    clinics={results.clinics}
+                    startRank={(results.page - 1) * PER_PAGE}
+                  />
                 )}
 
                 <div className="mt-[36px]">
