@@ -8,7 +8,7 @@ import FaqAccordion from "@/components/search/FaqAccordion";
 import FilterSidebar from "@/components/search/FilterSidebar";
 import LinkColumns from "@/components/search/LinkColumns";
 import Pagination from "@/components/search/Pagination";
-import PracticeCard from "@/components/search/PracticeCard";
+import ResultsList from "@/components/search/ResultsList";
 import SearchTopBar from "@/components/search/SearchTopBar";
 import {
   getPopularLocations,
@@ -16,6 +16,11 @@ import {
   getRegions,
   searchClinics,
 } from "@/lib/clinics";
+import {
+  hasPricingData,
+  hasReviewData,
+  hasTreatmentData,
+} from "@/lib/enrichment";
 import { FAQS, SECTION_TAGS, TREATMENTS } from "@/lib/search-data";
 
 export const metadata: Metadata = {
@@ -31,6 +36,8 @@ type SearchParams = Promise<{
   treatment?: string;
   location?: string;
   region?: string;
+  maxPrice?: string;
+  minRating?: string;
   page?: string;
 }>;
 
@@ -44,10 +51,15 @@ export default async function SearchPage({
   const location = params.location?.trim() ?? "";
   const region = params.region?.trim() ?? "";
   const page = Number.parseInt(params.page ?? "1", 10) || 1;
+  const maxPrice = params.maxPrice ? Number(params.maxPrice) : undefined;
+  const minRating = params.minRating ? Number(params.minRating) : undefined;
 
   const results = searchClinics({
     location,
     region,
+    treatment,
+    maxPrice: Number.isFinite(maxPrice) ? maxPrice : undefined,
+    minRating: Number.isFinite(minRating) ? minRating : undefined,
     page,
     perPage: PER_PAGE,
   });
@@ -57,6 +69,8 @@ export default async function SearchPage({
     if (treatment) next.set("treatment", treatment);
     if (location) next.set("location", location);
     if (region) next.set("region", region);
+    if (params.maxPrice) next.set("maxPrice", params.maxPrice);
+    if (params.minRating) next.set("minRating", params.minRating);
     if (nextPage > 1) next.set("page", String(nextPage));
     const qs = next.toString();
     return qs ? `/search?${qs}` : "/search";
@@ -67,8 +81,6 @@ export default async function SearchPage({
     : location
       ? `Dentists in ${location}`
       : "CQC-registered dentists";
-
-  const [featured, ...compact] = results.clinics;
 
   return (
     <>
@@ -133,6 +145,9 @@ export default async function SearchPage({
                   treatments={TREATMENTS}
                   regions={getRegions()}
                   resultCount={results.total}
+                  pricingConnected={hasPricingData()}
+                  reviewsConnected={hasReviewData()}
+                  treatmentsConnected={hasTreatmentData()}
                 />
               </Suspense>
 
@@ -143,16 +158,7 @@ export default async function SearchPage({
                     region filter.
                   </p>
                 ) : (
-                  <>
-                    <div className="flex flex-col gap-[16px]">
-                      <PracticeCard clinic={featured} featured />
-                    </div>
-                    <div className="mt-[20px] flex flex-col gap-[20px]">
-                      {compact.map((clinic) => (
-                        <PracticeCard key={clinic.id} clinic={clinic} />
-                      ))}
-                    </div>
-                  </>
+                  <ResultsList clinics={results.clinics} />
                 )}
 
                 <div className="mt-[36px]">

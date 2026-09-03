@@ -62,14 +62,34 @@ function AccordionSection({
   );
 }
 
+const PRICE_BANDS = [
+  { label: "Up to £25", value: "25" },
+  { label: "Up to £50", value: "50" },
+  { label: "Up to £100", value: "100" },
+  { label: "Any price", value: "" },
+];
+
+const RATING_BANDS = [
+  { label: "4.5 and above", value: "4.5" },
+  { label: "4.0 and above", value: "4" },
+  { label: "3.5 and above", value: "3.5" },
+  { label: "Any rating", value: "" },
+];
+
 export default function FilterSidebar({
   treatments,
   regions,
   resultCount,
+  pricingConnected,
+  reviewsConnected,
+  treatmentsConnected,
 }: {
   treatments: string[];
   regions: string[];
   resultCount: number;
+  pricingConnected: boolean;
+  reviewsConnected: boolean;
+  treatmentsConnected: boolean;
 }) {
   const router = useRouter();
   const params = useSearchParams();
@@ -78,6 +98,13 @@ export default function FilterSidebar({
 
   const treatment = params.get("treatment") ?? "";
   const region = params.get("region") ?? "";
+  const maxPrice = params.get("maxPrice") ?? "";
+  const minRating = params.get("minRating") ?? "";
+
+  const RADIO =
+    "size-[16px] shrink-0 rounded-full border border-navy/25 bg-white transition-colors peer-checked:border-navy peer-checked:bg-navy peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-2";
+  const LABEL =
+    "text-[16px] leading-[1.1] tracking-[-0.34px] text-navy sm:text-[17px]";
 
   const toggle = (key: string) =>
     setOpenSection((current) => (current === key ? null : key));
@@ -112,7 +139,11 @@ export default function FilterSidebar({
           title="Treatment type"
           open={openSection === "treatment"}
           onToggle={() => toggle("treatment")}
-          note="Treatment is used to frame your search. The CQC register does not record which treatments each practice offers, so it does not narrow the list below."
+          note={
+            treatmentsConnected
+              ? undefined
+              : "Awaiting treatment detection. Treatments are not in the CQC register — they come from crawling each clinic's site — so this frames your search but does not narrow the list yet."
+          }
         >
           <div className="flex flex-col gap-[14px]">
             {treatments.map((type) => (
@@ -188,21 +219,76 @@ export default function FilterSidebar({
           </div>
         </AccordionSection>
 
-        {/* Kept in place so the design's filter set stays recognisable, but
-            honest: the CQC export has no pricing or rating columns. */}
+        {/* Cost and Rating are wired to the same URL params the server reads,
+            so they start narrowing results the moment the pricing backend and
+            the Google Places review feed are connected. */}
         <AccordionSection
           title="Cost"
           open={openSection === "cost"}
           onToggle={() => toggle("cost")}
-          note="Not available yet. The CQC register does not publish treatment pricing, so this filter needs a pricing source before it can work."
-        />
+          note={
+            pricingConnected
+              ? undefined
+              : "Awaiting the pricing backend. Prices are set per clinic editorially, so this filter has nothing to narrow yet."
+          }
+        >
+          <div className="flex flex-col gap-[14px]">
+            {PRICE_BANDS.map((band) => (
+              <label
+                key={band.label}
+                className={`flex items-center gap-[7px] ${
+                  pricingConnected ? "cursor-pointer" : "cursor-not-allowed opacity-50"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="maxPrice"
+                  value={band.value}
+                  checked={maxPrice === band.value}
+                  disabled={!pricingConnected}
+                  onChange={() => setParam("maxPrice", band.value)}
+                  className="peer sr-only"
+                />
+                <span aria-hidden="true" className={RADIO} />
+                <span className={LABEL}>{band.label}</span>
+              </label>
+            ))}
+          </div>
+        </AccordionSection>
 
         <AccordionSection
           title="Rating"
           open={openSection === "rating"}
           onToggle={() => toggle("rating")}
-          note="Not available yet. This CQC export contains no rating column, so this filter needs a reviews source before it can work."
-        />
+          note={
+            reviewsConnected
+              ? "Ranked by weighted review score, so a clinic with a handful of five-star reviews cannot outrank one with hundreds."
+              : "Awaiting the Google Places review feed. Ratings and review counts come from there, then feed the weighted score."
+          }
+        >
+          <div className="flex flex-col gap-[14px]">
+            {RATING_BANDS.map((band) => (
+              <label
+                key={band.label}
+                className={`flex items-center gap-[7px] ${
+                  reviewsConnected ? "cursor-pointer" : "cursor-not-allowed opacity-50"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="minRating"
+                  value={band.value}
+                  checked={minRating === band.value}
+                  disabled={!reviewsConnected}
+                  onChange={() => setParam("minRating", band.value)}
+                  className="peer sr-only"
+                />
+                <span aria-hidden="true" className={RADIO} />
+                <span className={LABEL}>{band.label}</span>
+              </label>
+            ))}
+          </div>
+        </AccordionSection>
       </div>
     </aside>
   );

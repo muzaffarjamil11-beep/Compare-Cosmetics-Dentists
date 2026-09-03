@@ -1,4 +1,11 @@
 import clinicsJson from "@/data/clinics.json";
+import { getEnrichment } from "./enrichment";
+import {
+  computeReviewWeight,
+  globalAverageRating,
+  rankByWeight,
+  type ReviewWeight,
+} from "./ranking";
 
 /**
  * Access layer over the CQC "Dentists" export (12,268 registered practices).
@@ -38,7 +45,36 @@ export type Clinic = {
   services: string[];
 };
 
+/** A clinic with whatever enrichment is currently available attached. */
+export type RankedClinic = Clinic & {
+  reviewWeight: ReviewWeight | null;
+  cqcRating?: string;
+  treatments?: string[];
+  pricing?: {
+    consultation?: number;
+    treatmentFrom?: number;
+    financeAvailable?: boolean;
+    examRequired?: boolean;
+  };
+};
+
 const CLINICS = clinicsJson as Clinic[];
+
+/** The C term in the Bayesian score — the average across all reviewed clinics. */
+const GLOBAL_AVERAGE = globalAverageRating(
+  CLINICS.flatMap((c) => getEnrichment(c.id).reviews ?? []),
+);
+
+function withEnrichment(clinic: Clinic): RankedClinic {
+  const extra = getEnrichment(clinic.id);
+  return {
+    ...clinic,
+    reviewWeight: computeReviewWeight(extra.reviews ?? [], GLOBAL_AVERAGE),
+    cqcRating: extra.cqcRating,
+    treatments: extra.treatments,
+    pricing: extra.pricing,
+  };
+}
 
 export function getAllClinics(): Clinic[] {
   return CLINICS;
@@ -82,7 +118,7 @@ export function getRegions(): string[] {
 }
 
 export type SearchResult = {
-  clinics: Clinic[];
+  clinics: RankedClinic[];
   total: number;
   page: number;
   totalPages: number;
@@ -95,6 +131,12 @@ export type SearchOptions = {
   region?: string;
   /** Restrict to clinics whose CQC "Service types" include this value. */
   service?: string;
+  /** Taxonomy treatment; applies once treatment enrichment exists. */
+  treatment?: string;
+  /** Max consultation price in pounds; applies once pricing exists. */
+  maxPrice?: number;
+  /** Minimum weighted review score; applies once review data exists. */
+  minRating?: number;
   page?: number;
   perPage?: number;
 };
@@ -114,34 +156,63 @@ export function searchClinics({
   location,
   region,
   service,
+  treatment,
+  maxPrice,
+  minRating,
   page = 1,
   perPage = 9,
 }: SearchOptions = {}): SearchResult {
-  let results = CLINICS;
+  let base = CLINICS;
   let locationUnmatched = false;
 
   if (location) {
-    const matched = results.filter((c) => matchesLocation(c, location));
+    const matched = base.filter((c) => matchesLocation(c, location));
     if (matched.length > 0) {
-      results = matched;
+      base = matched;
     } else {
       locationUnmatched = true;
     }
   }
 
   if (region) {
-    results = results.filter((c) => c.region === region);
+    base = base.filter((c) => c.region === region);
   }
 
   if (service) {
-    results = results.filter((c) => c.services.includes(service));
+    base = base.filter((c) => c.services.includes(service));
   }
 
-  // Practices with a website and phone are the most useful to a visitor, so
-  // surface those first. Beyond that the CQC export gives no ranking signal.
-  const ordered = [...results].sort((a, b) => {
-    const score = (c: Clinic) => (c.website ? 2 : 0) + (c.phone ? 1 : 0);
-    return score(b) - score(a) || a.name.localeCompare(b.name);
+  let results = base.map(withEnrichment);
+
+  // The next three filters are no-ops until the matching enrichment source is
+  // connected, so an unfilled field never silently removes every clinic.
+  if (treatment) {
+    results = results.filter(
+      (c) => !c.treatments || c.treatments.includes(treatment),
+    );
+  }
+
+  if (typeof maxPrice === "number") {
+    results = results.filter((c) => {
+      const price = c.pricing?.consultation;
+      return price === undefined || price <= maxPrice;
+    });
+  }
+
+  if (typeof minRating === "number") {
+    results = results.filter(
+      (c) => !c.reviewWeight || c.reviewWeight.score >= minRating,
+    );
+  }
+
+  // Rank by weighted review score where reviews exist. With no review data the
+  // scores tie, so the fallback keeps the best-documented practices first.
+  const ordered = rankByWeight(results, (c) => c.reviewWeight).sort((a, b) => {
+    const aScore = a.reviewWeight?.score ?? -1;
+    const bScore = b.reviewWeight?.score ?? -1;
+    if (aScore !== bScore) return 0;
+    const docs = (c: Clinic) => (c.website ? 2 : 0) + (c.phone ? 1 : 0);
+    return docs(b) - docs(a) || a.name.localeCompare(b.name);
   });
 
   const total = ordered.length;
@@ -158,8 +229,8 @@ export function searchClinics({
   };
 }
 
-/** Best-documented practices in a location, for the home page's top three. */
-export function getTopClinics(location: string, count = 3): Clinic[] {
+/** Top-ranked practices in a location, for the home page's top three. */
+export function getTopClinics(location: string, count = 3): RankedClinic[] {
   return searchClinics({ location, perPage: count }).clinics;
 }
 
