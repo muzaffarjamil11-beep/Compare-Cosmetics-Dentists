@@ -28,7 +28,25 @@
  * column — so `cqcRating` is wired up here and will populate as soon as an
  * export containing it (or API access) is available.
  */
+import reviewsJson from "@/data/reviews.json";
 import type { ReviewSource } from "./ranking";
+
+/**
+ * Google ratings, keyed by CQC location ID, produced by
+ * scripts/fetch-google-reviews.mjs. Empty until that script is run with a
+ * Places API key. Only high-confidence (postcode-matched) results land here;
+ * uncertain matches are held in review-matches-to-review.json for a human.
+ */
+type GoogleReview = {
+  placeId: string;
+  rating: number;
+  count: number;
+  googleName?: string;
+  googleAddress?: string;
+  fetchedAt?: string;
+};
+
+const GOOGLE_REVIEWS = reviewsJson as Record<string, GoogleReview>;
 
 export type ClinicEnrichment = {
   /** Google Places, and Trustpilot where a business unit exists. */
@@ -53,7 +71,25 @@ export type ClinicEnrichment = {
 const ENRICHMENT: Record<string, ClinicEnrichment> = {};
 
 export function getEnrichment(locationId: string): ClinicEnrichment {
-  return ENRICHMENT[locationId] ?? {};
+  const manual = ENRICHMENT[locationId] ?? {};
+  const google = GOOGLE_REVIEWS[locationId];
+
+  if (!google) return manual;
+
+  // Google is the base source; anything already in ENRICHMENT (e.g. a
+  // Trustpilot business unit) blends alongside it by review volume.
+  return {
+    ...manual,
+    reviews: [
+      { rating: google.rating, count: google.count },
+      ...(manual.reviews ?? []),
+    ],
+  };
+}
+
+/** True once any Google rating has been fetched — drives the attribution. */
+export function hasGoogleReviews(): boolean {
+  return Object.keys(GOOGLE_REVIEWS).length > 0;
 }
 
 export function hasAnyEnrichment(): boolean {
@@ -62,7 +98,10 @@ export function hasAnyEnrichment(): boolean {
 
 /** True once review data exists, which is what the ranking depends on. */
 export function hasReviewData(): boolean {
-  return Object.values(ENRICHMENT).some((e) => (e.reviews?.length ?? 0) > 0);
+  return (
+    hasGoogleReviews() ||
+    Object.values(ENRICHMENT).some((e) => (e.reviews?.length ?? 0) > 0)
+  );
 }
 
 export function hasPricingData(): boolean {

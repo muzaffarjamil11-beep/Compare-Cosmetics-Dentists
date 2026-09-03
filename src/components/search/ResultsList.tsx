@@ -48,6 +48,10 @@ function ReviewWeight({ clinic }: { clinic: RankedClinic }) {
       <span className="text-[15px] tracking-[-0.3px] text-navy/70 sm:text-[17px]">
         ({count.toLocaleString("en-GB")})
       </span>
+      {/* Displaying Google ratings carries an attribution requirement. */}
+      <span className="text-[13px] tracking-[-0.26px] text-navy/50">
+        on Google
+      </span>
       <span className="sr-only">
         Weighted score {score.toFixed(2)} from {count} reviews
       </span>
