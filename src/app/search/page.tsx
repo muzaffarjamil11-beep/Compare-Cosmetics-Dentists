@@ -13,7 +13,6 @@ import SearchTopBar from "@/components/search/SearchTopBar";
 import {
   getPopularLocations,
   getPopularSearches,
-  getRegions,
   searchClinics,
 } from "@/lib/clinics";
 import {
@@ -143,7 +142,6 @@ export default async function SearchPage({
               >
                 <FilterSidebar
                   treatments={TREATMENTS}
-                  regions={getRegions()}
                   resultCount={results.total}
                   pricingConnected={hasPricingData()}
                   reviewsConnected={hasReviewData()}

@@ -78,14 +78,12 @@ const RATING_BANDS = [
 
 export default function FilterSidebar({
   treatments,
-  regions,
   resultCount,
   pricingConnected,
   reviewsConnected,
   treatmentsConnected,
 }: {
   treatments: string[];
-  regions: string[];
   resultCount: number;
   pricingConnected: boolean;
   reviewsConnected: boolean;
@@ -97,7 +95,6 @@ export default function FilterSidebar({
   const [openSection, setOpenSection] = useState<string | null>("treatment");
 
   const treatment = params.get("treatment") ?? "";
-  const region = params.get("region") ?? "";
   const maxPrice = params.get("maxPrice") ?? "";
   const minRating = params.get("minRating") ?? "";
 
@@ -165,54 +162,6 @@ export default function FilterSidebar({
                 />
                 <span className="text-[16px] leading-[1.1] tracking-[-0.34px] text-navy sm:text-[17px]">
                   {type}
-                </span>
-              </label>
-            ))}
-          </div>
-        </AccordionSection>
-
-        <AccordionSection
-          title="Region"
-          open={openSection === "region"}
-          onToggle={() => toggle("region")}
-        >
-          <div className="flex flex-col gap-[14px]">
-            <label className="flex cursor-pointer items-center gap-[7px]">
-              <input
-                type="radio"
-                name="region"
-                value=""
-                checked={region === ""}
-                onChange={() => setParam("region", "")}
-                className="peer sr-only"
-              />
-              <span
-                aria-hidden="true"
-                className="size-[16px] shrink-0 rounded-full border border-navy/25 bg-white transition-colors peer-checked:border-navy peer-checked:bg-navy peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-2"
-              />
-              <span className="text-[16px] leading-[1.1] tracking-[-0.34px] text-navy sm:text-[17px]">
-                All regions
-              </span>
-            </label>
-            {regions.map((r) => (
-              <label
-                key={r}
-                className="flex cursor-pointer items-center gap-[7px]"
-              >
-                <input
-                  type="radio"
-                  name="region"
-                  value={r}
-                  checked={region === r}
-                  onChange={() => setParam("region", r)}
-                  className="peer sr-only"
-                />
-                <span
-                  aria-hidden="true"
-                  className="size-[16px] shrink-0 rounded-full border border-navy/25 bg-white transition-colors peer-checked:border-navy peer-checked:bg-navy peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-2"
-                />
-                <span className="text-[16px] leading-[1.1] tracking-[-0.34px] text-navy sm:text-[17px]">
-                  {r}
                 </span>
               </label>
             ))}
