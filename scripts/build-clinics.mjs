@@ -74,19 +74,20 @@ const IDX = {
   url: col("URL"),
   serviceTypes: col("Service types"),
   provider: col("Provider name"),
+  published: col("Report publication date"),
   locationId: col("CQC Location ID (for office use only)"),
 };
 
 const clean = (v) => (v ?? "").trim();
 
-const seen = new Set();
-const clinics = [];
+const seenIds = new Set();
+const parsed = [];
 
 for (const row of rows.slice(1)) {
   const name = clean(row[IDX.name]);
   const id = clean(row[IDX.locationId]);
-  if (!name || !id || seen.has(id)) continue;
-  seen.add(id);
+  if (!name || !id || seenIds.has(id)) continue;
+  seenIds.add(id);
 
   const town = clean(row[IDX.town]);
   if (!town) continue;
@@ -101,7 +102,7 @@ for (const row of rows.slice(1)) {
     ),
   ];
 
-  clinics.push({
+  parsed.push({
     id,
     name,
     address: [clean(row[IDX.address1]), clean(row[IDX.address2])]
@@ -117,16 +118,51 @@ for (const row of rows.slice(1)) {
     cqcUrl: clean(row[IDX.url]),
     provider: clean(row[IDX.provider]),
     services,
+    published: clean(row[IDX.published]),
   });
 }
 
-clinics.sort((a, b) => a.name.localeCompare(b.name));
+/**
+ * Collapse duplicates, per plan §2.3: the same practice appears more than
+ * once through re-registration, rebrand, or a provider/location split. A CQC
+ * location ID is unique per registration so it never catches these — the
+ * match has to be on name plus postcode.
+ *
+ * Of each group we keep the most recently published record, since older
+ * registrations are the superseded ones, breaking ties on how complete the
+ * contact details are.
+ */
+const normalise = (value) => value.toLowerCase().replace(/[^a-z0-9]/g, "");
+const completeness = (c) => (c.website ? 2 : 0) + (c.phone ? 1 : 0);
+
+const groups = new Map();
+for (const clinic of parsed) {
+  const key = `${normalise(clinic.name)}|${normalise(clinic.postcode)}`;
+  const existing = groups.get(key);
+  if (!existing) {
+    groups.set(key, clinic);
+    continue;
+  }
+  const newer = clinic.published.localeCompare(existing.published);
+  const better =
+    newer > 0 ||
+    (newer === 0 && completeness(clinic) > completeness(existing));
+  if (better) groups.set(key, clinic);
+}
+
+const duplicatesRemoved = parsed.length - groups.size;
+
+const clinics = [...groups.values()]
+  .map(({ published, ...clinic }) => clinic)
+  .sort((a, b) => a.name.localeCompare(b.name));
 
 mkdirSync(dirname(output), { recursive: true });
 writeFileSync(output, JSON.stringify(clinics));
 
 const towns = new Set(clinics.map((c) => c.town));
 const regions = new Set(clinics.map((c) => c.region).filter(Boolean));
+console.log(`rows read:   ${parsed.length}`);
+console.log(`duplicates:  ${duplicatesRemoved} collapsed on name + postcode`);
 console.log(`clinics:  ${clinics.length}`);
 console.log(`towns:    ${towns.size}`);
 console.log(`regions:  ${regions.size}`);

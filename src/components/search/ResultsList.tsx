@@ -216,6 +216,7 @@ function ClinicCard({
           {/* Chip grows in with the panel. Every clinic here is on the CQC
               register, so the label stays accurate for any of them. */}
           <span
+            inert={!active}
             className={`grid transition-[grid-template-rows] ${EASE} ${
               active ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
             }`}
@@ -257,10 +258,14 @@ function ClinicCard({
         </span>
       </button>
 
+      {/* The panel stays mounted so it can animate, so `inert` is what keeps
+          its links out of the tab order and the accessibility tree while
+          collapsed. */}
       <div
         id={panelId}
         role="region"
         aria-label={`${clinic.name} pricing and contact`}
+        inert={!active}
         className={`grid transition-[grid-template-rows] ${EASE} ${
           active ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
         }`}
