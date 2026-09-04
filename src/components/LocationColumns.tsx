@@ -17,7 +17,7 @@ export default function LocationColumns({
   totalTowns: number;
 }) {
   return (
-    <section>
+    <section className="w-full">
       <h2 className="text-[20px] font-bold tracking-[-0.44px] text-navy sm:text-[22px]">
         Dentists by location
       </h2>

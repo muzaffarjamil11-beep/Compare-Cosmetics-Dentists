@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { ReactNode } from "react";
 
 type Treatment = { question: string; answer: string };
 
@@ -37,7 +38,14 @@ const TREATMENTS: Treatment[] = [
   },
 ];
 
-export default function PopularTreatments({ city = "Leeds" }: { city?: string }) {
+export default function PopularTreatments({
+  city = "Leeds",
+  locations,
+}: {
+  city?: string;
+  /** Full-width location columns, passed in from the server page. */
+  locations?: ReactNode;
+}) {
   // Index of the open row, or null when every row is collapsed. Holding a
   // single index (rather than a set) is what enforces "only one at a time".
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -52,7 +60,8 @@ export default function PopularTreatments({ city = "Leeds" }: { city?: string })
           in <span className="underline">{city}</span>
         </h2>
 
-        <div className="w-full max-w-[826px] rounded-[20px] bg-white p-[17px] md:p-[30px]">
+        {/* Full width, per review comment — was capped at 826px. */}
+        <div className="w-full rounded-[20px] bg-white p-[17px] md:p-[30px]">
           {/* Pulls in the first row's top padding and the last row's bottom
               padding so the collapsed card matches Figma's 359px content. */}
           <div className="-my-[23px]">
@@ -108,6 +117,8 @@ export default function PopularTreatments({ city = "Leeds" }: { city?: string })
             })}
           </div>
         </div>
+
+        {locations}
       </div>
     </section>
   );

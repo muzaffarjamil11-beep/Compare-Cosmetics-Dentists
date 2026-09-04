@@ -7,7 +7,7 @@ import Header from "@/components/Header";
 import FaqAccordion from "@/components/search/FaqAccordion";
 import FilterSidebar from "@/components/search/FilterSidebar";
 import LinkColumns from "@/components/search/LinkColumns";
-import LocationColumns from "@/components/search/LocationColumns";
+import LocationColumns from "@/components/LocationColumns";
 import Pagination from "@/components/search/Pagination";
 import ResultsList from "@/components/search/ResultsList";
 import SearchTopBar from "@/components/search/SearchTopBar";
