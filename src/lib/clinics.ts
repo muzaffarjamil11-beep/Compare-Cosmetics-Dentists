@@ -271,6 +271,44 @@ export function getTopClinics(location: string, count = 3): RankedClinic[] {
   return searchClinics({ location, perPage: count }).clinics;
 }
 
+export type RegionSummary = {
+  region: string;
+  clinicCount: number;
+  townCount: number;
+  towns: { town: string; count: number }[];
+};
+
+/**
+ * Locations grouped by region, for the full-width location columns. Each
+ * region carries its own practice and town counts so the column can lead with
+ * a descriptive box rather than a bare list of links.
+ */
+export function getRegionSummaries(townsPerRegion = 10): RegionSummary[] {
+  const byRegion = new Map<string, Map<string, number>>();
+
+  for (const clinic of CLINICS) {
+    if (!clinic.region) continue;
+    const towns = byRegion.get(clinic.region) ?? new Map<string, number>();
+    towns.set(clinic.town, (towns.get(clinic.town) ?? 0) + 1);
+    byRegion.set(clinic.region, towns);
+  }
+
+  return [...byRegion.entries()]
+    .map(([region, towns]) => {
+      const ordered = [...towns.entries()]
+        .map(([town, count]) => ({ town, count }))
+        .sort((a, b) => b.count - a.count || a.town.localeCompare(b.town));
+
+      return {
+        region,
+        clinicCount: ordered.reduce((sum, t) => sum + t.count, 0),
+        townCount: ordered.length,
+        towns: ordered.slice(0, townsPerRegion),
+      };
+    })
+    .sort((a, b) => b.clinicCount - a.clinicCount);
+}
+
 /** "Dentists in <town>" links, generated from real practice counts. */
 export function getPopularLocations(limit = 27): string[] {
   return getTownsByCount()

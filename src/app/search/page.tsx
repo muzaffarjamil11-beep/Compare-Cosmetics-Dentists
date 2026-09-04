@@ -7,12 +7,14 @@ import Header from "@/components/Header";
 import FaqAccordion from "@/components/search/FaqAccordion";
 import FilterSidebar from "@/components/search/FilterSidebar";
 import LinkColumns from "@/components/search/LinkColumns";
+import LocationColumns from "@/components/search/LocationColumns";
 import Pagination from "@/components/search/Pagination";
 import ResultsList from "@/components/search/ResultsList";
 import SearchTopBar from "@/components/search/SearchTopBar";
 import {
-  getPopularLocations,
+  getAllTowns,
   getPopularSearches,
+  getRegionSummaries,
   searchClinics,
 } from "@/lib/clinics";
 import {
@@ -177,7 +179,9 @@ export default async function SearchPage({
               </div>
             </div>
 
-            <div className="mt-[56px] flex flex-col gap-[40px] lg:pl-[352px]">
+            {/* Full width: the lower sections span the whole content column,
+                not just the results column. */}
+            <div className="mt-[56px] flex flex-col gap-[40px]">
               <FaqAccordion faqs={FAQS} />
 
               <section className="rounded-[12px] bg-white px-[24px] py-[22px]">
@@ -206,15 +210,9 @@ export default async function SearchPage({
                 </div>
               </section>
 
-              <LinkColumns
-                title="Popular Locations"
-                items={getPopularLocations(27).map((label) => {
-                  const town = label.replace(/^Dentists in /, "");
-                  return {
-                    label,
-                    href: `/search?location=${encodeURIComponent(town)}`,
-                  };
-                })}
+              <LocationColumns
+                regions={getRegionSummaries(10)}
+                totalTowns={getAllTowns().length}
               />
               <LinkColumns
                 title="Popular searches"

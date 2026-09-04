@@ -47,13 +47,7 @@ export default function PopularTreatments({ city = "Leeds" }: { city?: string })
     <section className="bg-primary-light py-12 md:py-16">
       <div className="mx-auto flex w-full max-w-[1440px] flex-col items-center gap-12 px-4 md:gap-16 md:px-10">
         <h2 className="text-center text-[32px] font-bold leading-[0.94] tracking-[-0.64px] text-navy md:text-[42px] md:tracking-[-0.84px]">
-          Here&rsquo;s some
-          {/* Hidden by default with two overrides that both set `inline`,
-              rather than `md:hidden 3xl:inline` — Tailwind emits the 3xl
-              block before md, so md:hidden would win at every width. The
-              break is therefore absent only between tablet and 1360px,
-              collapsing the heading to two lines where there is room. */}
-          <br className="hidden max-md:inline 3xl:inline" /> Popular treatments
+          Popular treatments
           <br />
           in <span className="underline">{city}</span>
         </h2>
