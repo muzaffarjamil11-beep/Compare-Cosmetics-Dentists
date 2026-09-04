@@ -43,7 +43,10 @@ export default function Hero() {
               <SearchForm variant="hero" />
             </div>
 
-            <div className="flex w-full flex-wrap items-center justify-between gap-x-2 gap-y-3 md:gap-x-4">
+            {/* Figma groups these centrally with a 41px gap. Mobile keeps
+                justify-between, because at 375px the pair only just fits and
+                a fixed gap pushes the rating past the card edge. */}
+            <div className="flex w-full flex-wrap items-center justify-between gap-x-2 gap-y-3 md:justify-center md:gap-x-[41px]">
               <p className="whitespace-nowrap text-[16px] font-bold leading-[1.16] tracking-[-0.32px] text-navy">
                 Advice you can trust
               </p>
