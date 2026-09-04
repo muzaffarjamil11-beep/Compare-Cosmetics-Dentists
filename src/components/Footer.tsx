@@ -1,8 +1,6 @@
 import SearchForm from "./SearchForm";
 import { getPopularLocations } from "@/lib/clinics";
 
-const LEGAL_LINKS = ["Terms & Conditions", "Privacy Policy", "Cookies"];
-
 function Logo({ compact = false }: { compact?: boolean }) {
   return (
     <div className="flex shrink-0 items-center gap-[15px]">
@@ -86,19 +84,6 @@ export default function Footer() {
                 />
               ))}
             </div>
-          ))}
-        </div>
-
-        {/* Mobile: legal links */}
-        <div className="flex flex-col gap-3 md:hidden">
-          {LEGAL_LINKS.map((label) => (
-            <a
-              key={label}
-              href="#"
-              className="text-[16px] tracking-[-0.48px] text-white/90"
-            >
-              {label}
-            </a>
           ))}
         </div>
 
