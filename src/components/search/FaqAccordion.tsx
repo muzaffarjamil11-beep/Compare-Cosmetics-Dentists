@@ -1,9 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import LocationLinkColumns from "@/components/LocationLinkColumns";
+import type { RegionSummary } from "@/lib/clinics";
 import type { Faq } from "@/lib/search-data";
 
-export default function FaqAccordion({ faqs }: { faqs: Faq[] }) {
+export default function FaqAccordion({
+  faqs,
+  regions,
+}: {
+  faqs: Faq[];
+  /** Region data for the location columns under each answer. */
+  regions: RegionSummary[];
+}) {
   // A single index rather than a set, so opening one closes the previous.
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
@@ -52,9 +61,14 @@ export default function FaqAccordion({ faqs }: { faqs: Faq[] }) {
                 }`}
               >
                 <div className="overflow-hidden">
-                  <p className="pr-8 pb-[16px] text-[15px] leading-[1.55] tracking-[-0.3px] text-navy/75 sm:text-[16px]">
+                  <p className="pr-8 text-[15px] leading-[1.55] tracking-[-0.3px] text-navy/75 sm:text-[16px]">
                     {faq.answer}
                   </p>
+                  {/* Location columns under every question, each column led
+                      by a descriptive box. */}
+                  <div className="pt-[16px] pb-[16px]">
+                    <LocationLinkColumns regions={regions} />
+                  </div>
                 </div>
               </div>
             </div>

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import type { ReactNode } from "react";
+import LocationLinkColumns from "./LocationLinkColumns";
+import type { RegionSummary } from "@/lib/clinics";
 
 type Treatment = { question: string; answer: string };
 
@@ -40,11 +41,11 @@ const TREATMENTS: Treatment[] = [
 
 export default function PopularTreatments({
   city = "Leeds",
-  locations,
+  regions,
 }: {
   city?: string;
-  /** Full-width location columns, passed in from the server page. */
-  locations?: ReactNode;
+  /** Region data for the location columns inside each panel. */
+  regions: RegionSummary[];
 }) {
   // Index of the open row, or null when every row is collapsed. Holding a
   // single index (rather than a set) is what enforces "only one at a time".
@@ -107,9 +108,18 @@ export default function PopularTreatments({
                     }`}
                   >
                     <div className="overflow-hidden">
-                      <p className="pr-8 pb-[23px] text-[16px] leading-[1.5] tracking-[-0.32px] text-navy/75 md:text-[18px]">
+                      <p className="pr-8 text-[16px] leading-[1.5] tracking-[-0.32px] text-navy/75 md:text-[18px]">
                         {item.answer}
                       </p>
+                      {/* Location columns for this treatment: multiple
+                          columns with a descriptive box in each, under every
+                          question. */}
+                      <div className="pt-[18px] pb-[23px]">
+                        <LocationLinkColumns
+                          regions={regions}
+                          treatment={item.question.replace(/\s+/g, " ").trim()}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -117,8 +127,6 @@ export default function PopularTreatments({
             })}
           </div>
         </div>
-
-        {locations}
       </div>
     </section>
   );

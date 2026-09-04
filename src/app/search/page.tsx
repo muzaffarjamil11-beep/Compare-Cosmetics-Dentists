@@ -7,12 +7,10 @@ import Header from "@/components/Header";
 import FaqAccordion from "@/components/search/FaqAccordion";
 import FilterSidebar from "@/components/search/FilterSidebar";
 import LinkColumns from "@/components/search/LinkColumns";
-import LocationColumns from "@/components/LocationColumns";
 import Pagination from "@/components/search/Pagination";
 import ResultsList from "@/components/search/ResultsList";
 import SearchTopBar from "@/components/search/SearchTopBar";
 import {
-  getAllTowns,
   getPopularSearches,
   getRegionSummaries,
   searchClinics,
@@ -182,7 +180,7 @@ export default async function SearchPage({
             {/* Full width: the lower sections span the whole content column,
                 not just the results column. */}
             <div className="mt-[56px] flex flex-col gap-[40px]">
-              <FaqAccordion faqs={FAQS} />
+              <FaqAccordion faqs={FAQS} regions={getRegionSummaries(6)} />
 
               <section className="rounded-[12px] bg-white px-[24px] py-[22px]">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -209,11 +207,6 @@ export default async function SearchPage({
                   </ul>
                 </div>
               </section>
-
-              <LocationColumns
-                regions={getRegionSummaries(10)}
-                totalTowns={getAllTowns().length}
-              />
               <LinkColumns
                 title="Popular searches"
                 items={getPopularSearches(TREATMENTS, 27).map((label) => {
