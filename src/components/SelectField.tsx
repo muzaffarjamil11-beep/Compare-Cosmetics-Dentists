@@ -47,6 +47,39 @@ export default function SelectField({
 }) {
   const [open, setOpen] = useState(false);
   const labelRef = useRef<HTMLLabelElement>(null);
+  const selectRef = useRef<HTMLSelectElement>(null);
+
+  /**
+   * Clicking a <label> only focuses its select, it does not open the
+   * dropdown, so a click on the icon, the blank space or the chevron has to
+   * open the picker itself.
+   *
+   * This runs on click rather than mousedown because showPicker() requires
+   * transient user activation, and click is unambiguously an activation
+   * triggering event. Where showPicker is unsupported the field still
+   * focuses, which is the pre-existing behaviour.
+   */
+  const toggleFromLabel = (event: React.MouseEvent) => {
+    const select = selectRef.current;
+    if (!select || event.target === select) return; // the select handles its own clicks
+
+    // Stop the label's own activation behaviour, which would just focus it.
+    event.preventDefault();
+
+    if (open) {
+      setOpen(false);
+      select.blur();
+      return;
+    }
+
+    select.focus();
+    try {
+      select.showPicker();
+      setOpen(true);
+    } catch {
+      // Left focused, which is the best available fallback.
+    }
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -71,6 +104,7 @@ export default function SelectField({
   return (
     <label
       ref={labelRef}
+      onClick={toggleFromLabel}
       className={`relative flex cursor-pointer items-center gap-3 rounded-xl bg-white pr-[18px] pl-[15px] ${
         compact ? "h-[43px]" : "h-[53px]"
       } ${className}`}
@@ -81,6 +115,7 @@ export default function SelectField({
         className={`${iconClass} pointer-events-none shrink-0`}
       />
       <select
+        ref={selectRef}
         name={name}
         aria-label={label}
         defaultValue={defaultValue}
