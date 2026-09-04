@@ -46,14 +46,14 @@ export default function SearchForm({
     variant === "bar"
       ? "md:flex-[505_1_0]"
       : isFooter
-        ? "min-w-0 flex-1 xl:w-[240px] xl:flex-none"
+        ? "w-full min-w-0 sm:flex-1 xl:w-[240px] xl:flex-none"
         : "w-full lg:w-auto lg:flex-1";
 
   const locationWidth =
     variant === "bar"
       ? "md:flex-[409_1_0]"
       : isFooter
-        ? "min-w-0 flex-1 xl:w-[240px] xl:flex-none"
+        ? "w-full min-w-0 sm:flex-1 xl:w-[240px] xl:flex-none"
         : "w-full lg:w-auto lg:flex-1";
 
   return (
