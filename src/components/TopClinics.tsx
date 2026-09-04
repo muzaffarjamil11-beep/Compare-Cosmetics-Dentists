@@ -1,19 +1,44 @@
-import { formatAddress, getTopClinics, type Clinic } from "@/lib/clinics";
+import { formatAddress, getTopClinics, type RankedClinic } from "@/lib/clinics";
 
 /* Three cards sit side by side from 768px, where each is only ~214px wide, so
    the type steps down for tablet and only reaches Figma's desktop sizes at
    1280px, where a card is wide enough (~384px) to carry them. */
 const META_TEXT =
   "text-[13px] leading-[1.25] tracking-[-0.26px] text-navy md:text-[12px] lg:text-[13px] xl:text-[15px] xl:tracking-[-0.3px]";
-const CARD_ACTION =
-  "flex h-[43px] items-center justify-center rounded-xl px-2 text-[16px] font-bold tracking-[-0.32px] transition-transform duration-200 ease-out hover:scale-105 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:scale-100 md:h-[40px] md:w-full md:text-[14px] lg:h-[43px] lg:w-auto lg:flex-1 lg:text-[16px] xl:h-[51px] xl:rounded-[14px] xl:text-[18px] xl:tracking-[-0.36px]";
 
-function ClinicCard({ clinic }: { clinic: Clinic }) {
+function initials(name: string): string {
+  return name
+    .replace(/[^A-Za-z0-9 ]/g, " ")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word[0]!.toUpperCase())
+    .join("");
+}
+
+function ClinicCard({ clinic }: { clinic: RankedClinic }) {
   return (
     <div className="flex h-full w-full flex-col rounded-[20px] bg-white p-[15px] md:p-[18px] xl:rounded-[24px]">
-      <h3 className="text-[22px] font-bold leading-[1.05] tracking-[-0.44px] text-navy md:text-[17px] md:tracking-[-0.34px] lg:text-[20px] lg:tracking-[-0.4px] xl:text-[26px] xl:tracking-[-0.52px]">
-        {clinic.name}
-      </h3>
+      <div className="flex items-start justify-between gap-3">
+        {/* The name is the "learn more" link — it opens the practice's CQC
+            report, so the card needs only one button. */}
+        <h3 className="min-w-0 text-[22px] font-bold leading-[1.05] tracking-[-0.44px] text-navy md:text-[17px] md:tracking-[-0.34px] lg:text-[20px] lg:tracking-[-0.4px] xl:text-[26px] xl:tracking-[-0.52px]">
+          <a
+            href={clinic.cqcUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition-opacity hover:underline hover:opacity-75"
+          >
+            {clinic.name}
+          </a>
+        </h3>
+
+        {/* Logo slot. The CQC register ships no logos, so this shows the
+            practice initials until a logo source is attached. */}
+        <span className="flex size-[46px] shrink-0 items-center justify-center rounded-[10px] bg-primary-light text-[16px] font-bold text-navy md:size-[40px] md:text-[14px] lg:size-[46px] lg:text-[16px] xl:size-[56px] xl:rounded-[12px] xl:text-[20px]">
+          {initials(clinic.name)}
+        </span>
+      </div>
 
       <div className="mt-[14px] flex items-start gap-[10px]">
         <img
@@ -25,33 +50,30 @@ function ClinicCard({ clinic }: { clinic: Clinic }) {
       </div>
 
       {clinic.phone && (
-        <p className={`mt-[8px] pl-[24px] ${META_TEXT}`}>{clinic.phone}</p>
+        <a
+          href={`tel:${clinic.phone.replace(/\s+/g, "")}`}
+          className={`mt-[8px] pl-[24px] hover:underline ${META_TEXT}`}
+        >
+          {clinic.phone}
+        </a>
       )}
 
-      {/* mt-auto keeps the actions bottom-aligned across all three cards
-          even if one address wraps to a second line. */}
-      <div className="mt-auto flex gap-[10px] pt-[20px] md:flex-col md:gap-[8px] lg:flex-row lg:gap-[10px]">
-        <a
-          href={clinic.cqcUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`${CARD_ACTION} flex-1 bg-primary-light text-navy`}
-        >
-          CQC report
-        </a>
+      {/* mt-auto keeps the action bottom-aligned across all three cards even
+          if one address wraps to a second line. */}
+      <div className="mt-auto pt-[20px]">
         {clinic.website ? (
           <a
             href={clinic.website}
             target="_blank"
             rel="noopener noreferrer"
-            className={`${CARD_ACTION} flex-1 bg-primary text-white`}
+            className="flex h-[43px] w-full cursor-pointer items-center justify-center rounded-xl bg-primary px-2 text-[16px] font-bold tracking-[-0.32px] text-white transition-transform duration-200 ease-out hover:scale-105 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:scale-100 md:h-[40px] md:text-[14px] lg:h-[43px] lg:text-[16px] xl:h-[51px] xl:rounded-[14px] xl:text-[18px]"
           >
             Visit website
           </a>
         ) : (
           <span
             aria-disabled="true"
-            className={`${CARD_ACTION} flex-1 cursor-default bg-primary text-white opacity-45`}
+            className="flex h-[43px] w-full cursor-default items-center justify-center rounded-xl bg-primary px-2 text-[16px] font-bold tracking-[-0.32px] text-white opacity-45 md:h-[40px] md:text-[14px] lg:h-[43px] lg:text-[16px] xl:h-[51px] xl:rounded-[14px] xl:text-[18px]"
           >
             No website
           </span>
@@ -66,8 +88,10 @@ export default function TopClinics({ location = "Leeds" }: { location?: string }
   const clinics = getTopClinics(location, 3);
 
   return (
+    // The heading sits on equal space top and bottom: the section's vertical
+    // padding matches the gap down to the cards.
     <section className="bg-surface py-12 md:py-16">
-      <div className="mx-auto flex w-full max-w-[1440px] flex-col items-center gap-8 px-4 md:gap-[34px] md:px-10">
+      <div className="mx-auto flex w-full max-w-[1440px] flex-col items-center gap-12 px-4 md:gap-16 md:px-10">
         <h2 className="text-center text-[32px] font-bold leading-[0.94] tracking-[-0.64px] text-navy md:text-[42px] md:tracking-[-0.84px]">
           Top rated dental
           <br />
@@ -80,10 +104,6 @@ export default function TopClinics({ location = "Leeds" }: { location?: string }
             </div>
           ))}
         </div>
-        <p className="text-center text-[13px] text-navy/55">
-          Practice details from the Care Quality Commission register. CQC
-          ratings are not included in this dataset.
-        </p>
       </div>
     </section>
   );
