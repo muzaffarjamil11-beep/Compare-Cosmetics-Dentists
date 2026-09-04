@@ -22,7 +22,7 @@ function ClinicCard({ clinic }: { clinic: RankedClinic }) {
       <div className="flex items-start justify-between gap-3">
         {/* The name is the "learn more" link — it opens the practice's CQC
             report, so the card needs only one button. */}
-        <h3 className="min-w-0 text-[22px] font-bold leading-[1.05] tracking-[-0.44px] text-navy md:text-[17px] md:tracking-[-0.34px] lg:text-[20px] lg:tracking-[-0.4px] xl:text-[26px] xl:tracking-[-0.52px]">
+        <h3 className="max-w-[175px] min-w-0 text-[22px] font-bold leading-[1.05] tracking-[-0.44px] text-navy md:text-[17px] md:tracking-[-0.34px] lg:text-[20px] lg:tracking-[-0.4px] xl:text-[26px] xl:tracking-[-0.52px]">
           <a
             href={clinic.cqcUrl}
             target="_blank"
