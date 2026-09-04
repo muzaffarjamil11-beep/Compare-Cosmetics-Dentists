@@ -1,79 +1,9 @@
 import Button from "@/components/Button";
+import SelectField from "@/components/SelectField";
 import { getLocationOptions } from "@/lib/clinics";
 import { TREATMENTS } from "@/lib/search-data";
 
 type Variant = "hero" | "bar" | "footer";
-
-/**
- * A single search field.
- *
- * The whole pill is a <label>, so clicking anywhere in it — the icon, the
- * blank space, or the chevron — activates the select and opens the dropdown,
- * rather than only the text hitting it. The icons are pointer-events-none so
- * they never swallow the click.
- *
- * The chevron flips while the select has focus, which is what opening the
- * dropdown does, so the arrow reverses as the list appears.
- */
-function Field({
-  name,
-  label,
-  icon,
-  iconClass,
-  chevron,
-  options,
-  defaultValue,
-  compact,
-  className = "",
-}: {
-  name: string;
-  label: string;
-  icon: string;
-  iconClass: string;
-  chevron: string;
-  options: string[];
-  defaultValue: string;
-  compact: boolean;
-  className?: string;
-}) {
-  const optionClass = compact ? "bg-white text-black" : "bg-white text-navy";
-
-  return (
-    <label
-      className={`relative flex cursor-pointer items-center gap-3 rounded-xl bg-white pr-[18px] pl-[15px] ${
-        compact ? "h-[43px]" : "h-[53px]"
-      } ${className}`}
-    >
-      <img
-        src={icon}
-        alt=""
-        className={`${iconClass} pointer-events-none shrink-0`}
-      />
-      <select
-        name={name}
-        aria-label={label}
-        defaultValue={defaultValue}
-        className={`peer w-full min-w-0 cursor-pointer appearance-none bg-transparent text-[16px] tracking-[-0.36px] outline-none sm:text-[18px] ${
-          compact ? "text-black" : "text-navy"
-        }`}
-      >
-        <option value="" className={optionClass}>
-          {label}
-        </option>
-        {options.map((option) => (
-          <option key={option} value={option} className={optionClass}>
-            {option}
-          </option>
-        ))}
-      </select>
-      <img
-        src={chevron}
-        alt=""
-        className="pointer-events-none h-[8px] w-[14px] shrink-0 transition-transform duration-200 ease-out peer-focus:rotate-[180deg] motion-reduce:transition-none"
-      />
-    </label>
-  );
-}
 
 /**
  * The treatment/location search used on the home hero, the footer and the
@@ -128,7 +58,7 @@ export default function SearchForm({
 
   return (
     <form action="/search" method="get" className={layout}>
-      <Field
+      <SelectField
         name="treatment"
         label="Select treatment"
         icon={icons.treatment}
@@ -140,7 +70,7 @@ export default function SearchForm({
         className={treatmentWidth}
       />
 
-      <Field
+      <SelectField
         name="location"
         label="Select location"
         icon={icons.location}
