@@ -21,10 +21,12 @@ export default function Button({
   variant?: Variant;
   children: ReactNode;
 }) {
+  // cursor-pointer is explicit: a native <button> renders the default arrow,
+  // and Tailwind's preflight does not change that.
   return (
     <button
       type="button"
-      className={`flex items-center justify-center rounded-xl font-bold transition-transform duration-200 ease-out hover:scale-105 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:scale-100 ${VARIANTS[variant]} ${className}`}
+      className={`flex cursor-pointer items-center justify-center rounded-xl font-bold transition-transform duration-200 ease-out hover:scale-105 active:scale-[0.98] disabled:cursor-not-allowed motion-reduce:transition-none motion-reduce:hover:scale-100 ${VARIANTS[variant]} ${className}`}
       {...props}
     >
       {children}
