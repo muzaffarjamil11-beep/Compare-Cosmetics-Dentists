@@ -49,15 +49,6 @@ function ClinicCard({ clinic }: { clinic: RankedClinic }) {
         <p className={META_TEXT}>{formatAddress(clinic)}</p>
       </div>
 
-      {clinic.phone && (
-        <a
-          href={`tel:${clinic.phone.replace(/\s+/g, "")}`}
-          className={`mt-[8px] pl-[24px] hover:underline ${META_TEXT}`}
-        >
-          {clinic.phone}
-        </a>
-      )}
-
       {/* mt-auto keeps the action bottom-aligned across all three cards even
           if one address wraps to a second line. */}
       <div className="mt-auto pt-[20px]">
