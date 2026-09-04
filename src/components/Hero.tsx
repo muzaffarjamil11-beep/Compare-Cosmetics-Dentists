@@ -1,5 +1,22 @@
 import SearchForm from "./SearchForm";
 
+function Rating() {
+  return (
+    <div className="flex shrink-0 items-center gap-1 md:gap-2">
+      <span className="text-[13px] leading-[1.16] tracking-[-0.26px] text-navy">
+        4.9
+      </span>
+      <img
+        src="/images/stars-5.svg"
+        alt="Rated 4.9 out of 5"
+        width={68}
+        height={12}
+      />
+      <img src="/images/feefo-logo.svg" alt="feefo" width={57} height={13} />
+    </div>
+  );
+}
+
 export default function Hero() {
   return (
     <section className="pt-4 pb-[30px] md:pt-0">
@@ -26,11 +43,15 @@ export default function Hero() {
               <SearchForm variant="hero" />
             </div>
 
-            {/* The Feefo score that sat beside this is gone — there are no
-                Feefo reviews — so the tagline stands centred on its own. */}
-            <p className="w-full text-center text-[16px] font-bold leading-[1.16] tracking-[-0.32px] text-navy">
-              Advice you can trust
-            </p>
+            {/* Figma groups these centrally with a 41px gap. Mobile keeps
+                justify-between, because at 375px the pair only just fits and
+                a fixed gap pushes the rating past the card edge. */}
+            <div className="flex w-full flex-wrap items-center justify-between gap-x-2 gap-y-3 md:justify-center md:gap-x-[41px]">
+              <p className="whitespace-nowrap text-[16px] font-bold leading-[1.16] tracking-[-0.32px] text-navy">
+                Advice you can trust
+              </p>
+              <Rating />
+            </div>
           </div>
         </div>
       </div>
