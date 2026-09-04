@@ -20,7 +20,8 @@ import {
   hasReviewData,
   hasTreatmentData,
 } from "@/lib/enrichment";
-import { FAQS, SECTION_TAGS, TREATMENTS } from "@/lib/search-data";
+import { FAQS, SECTION_TAGS } from "@/lib/search-data";
+import { TREATMENTS } from "@/lib/taxonomy";
 
 export const metadata: Metadata = {
   title: "Find a CQC-registered dentist near you | Compare Cosmetic Dentist",
@@ -35,6 +36,7 @@ type SearchParams = Promise<{
   treatment?: string;
   location?: string;
   region?: string;
+  provider?: string;
   maxPrice?: string;
   minRating?: string;
   page?: string;
@@ -49,6 +51,7 @@ export default async function SearchPage({
   const treatment = params.treatment?.trim() ?? "";
   const location = params.location?.trim() ?? "";
   const region = params.region?.trim() ?? "";
+  const provider = params.provider?.trim() ?? "";
   const page = Number.parseInt(params.page ?? "1", 10) || 1;
   const maxPrice = params.maxPrice ? Number(params.maxPrice) : undefined;
   const minRating = params.minRating ? Number(params.minRating) : undefined;
@@ -56,6 +59,7 @@ export default async function SearchPage({
   const results = searchClinics({
     location,
     region,
+    provider,
     treatment,
     maxPrice: Number.isFinite(maxPrice) ? maxPrice : undefined,
     minRating: Number.isFinite(minRating) ? minRating : undefined,
@@ -68,6 +72,7 @@ export default async function SearchPage({
     if (treatment) next.set("treatment", treatment);
     if (location) next.set("location", location);
     if (region) next.set("region", region);
+    if (provider) next.set("provider", provider);
     if (params.maxPrice) next.set("maxPrice", params.maxPrice);
     if (params.minRating) next.set("minRating", params.minRating);
     if (nextPage > 1) next.set("page", String(nextPage));

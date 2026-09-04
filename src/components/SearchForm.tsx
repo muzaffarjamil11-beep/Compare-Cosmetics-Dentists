@@ -1,7 +1,7 @@
 import Button from "@/components/Button";
 import SelectField from "@/components/SelectField";
 import { getLocationOptions } from "@/lib/clinics";
-import { TREATMENTS } from "@/lib/search-data";
+import { TREATMENTS } from "@/lib/taxonomy";
 
 type Variant = "hero" | "bar" | "footer";
 

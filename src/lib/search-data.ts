@@ -3,18 +3,9 @@
  *
  * Clinic records, locations and popular-link lists now come from the CQC
  * register via src/lib/clinics.ts. What remains here is content the CQC
- * export does not provide: the site's own treatment taxonomy, the FAQ copy
- * and the browse-by tags.
+ * export does not provide: the FAQ copy and the browse-by tags.
+ * The treatment taxonomy lives in src/lib/taxonomy.ts.
  */
-
-export const TREATMENTS = [
-  "Clear Aligners",
-  "Porcelain Veneers",
-  "Dental Hygienist",
-  "Composite Bonding",
-  "Dental Implants",
-  "Teeth Whitening",
-];
 
 
 export type Faq = { question: string; answer: string };

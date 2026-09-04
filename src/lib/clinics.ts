@@ -117,6 +117,35 @@ export function getRegions(): string[] {
   return [...new Set(CLINICS.map((c) => c.region).filter(Boolean))].sort();
 }
 
+/** Every town with at least one registered practice, for the locations hub. */
+export function getAllTowns(): { town: string; count: number }[] {
+  return getTownsByCount().sort((a, b) => a.town.localeCompare(b.town));
+}
+
+const providerCounts = (() => {
+  const counts = new Map<string, number>();
+  for (const clinic of CLINICS) {
+    const provider = clinic.provider.trim();
+    if (provider) counts.set(provider, (counts.get(provider) ?? 0) + 1);
+  }
+  return counts;
+})();
+
+/**
+ * CQC provider records, which is how the groups and chains show up — a
+ * provider running many locations is a group. `minClinics` filters out the
+ * thousands of single-practice providers, which are usually one dentist's
+ * own name rather than a brand worth a page.
+ */
+export function getProviders(
+  minClinics = 1,
+): { provider: string; count: number }[] {
+  return [...providerCounts.entries()]
+    .filter(([, count]) => count >= minClinics)
+    .map(([provider, count]) => ({ provider, count }))
+    .sort((a, b) => b.count - a.count || a.provider.localeCompare(b.provider));
+}
+
 export type SearchResult = {
   clinics: RankedClinic[];
   total: number;
@@ -131,6 +160,8 @@ export type SearchOptions = {
   region?: string;
   /** Restrict to clinics whose CQC "Service types" include this value. */
   service?: string;
+  /** CQC provider name, so a group's practices can be listed together. */
+  provider?: string;
   /** Taxonomy treatment; applies once treatment enrichment exists. */
   treatment?: string;
   /** Max consultation price in pounds; applies once pricing exists. */
@@ -156,6 +187,7 @@ export function searchClinics({
   location,
   region,
   service,
+  provider,
   treatment,
   maxPrice,
   minRating,
@@ -180,6 +212,11 @@ export function searchClinics({
 
   if (service) {
     base = base.filter((c) => c.services.includes(service));
+  }
+
+  if (provider) {
+    const needle = provider.toLowerCase();
+    base = base.filter((c) => c.provider.toLowerCase() === needle);
   }
 
   let results = base.map(withEnrichment);
